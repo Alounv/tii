@@ -6,7 +6,7 @@
   },
   "private": true,
   "scripts": {
-    "build": "qwik build",
+    "build": "pnpm run prisma:generate && pnpm run prisma:migrate && pnpm qwik build",
     "build.client": "vite build",
     "build.preview": "vite build --ssr src/entry.preview.tsx",
     "build.server": "vite build -c adapters/express/vite.config.ts",
@@ -19,6 +19,8 @@
     "lint": "eslint \"src/**/*.ts*\"",
     "preview": "qwik build preview && vite preview --open",
     "start": "vite --open --mode ssr",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
     "qwik": "qwik"
   },
   "devDependencies": {
@@ -35,9 +37,15 @@
     "eslint-plugin-qwik": "0.24.0",
     "express": "4.18.2",
     "prettier": "2.8.6",
+    "prisma": "4.11.0",
     "typescript": "5.0.2",
     "undici": "5.21.0",
     "vite": "4.2.1",
-    "vite-tsconfig-paths": "3.5.0"
+    "vite-tsconfig-paths": "3.5.0",
+    "@prisma/client": "4.11.0",
+    "@auth/core": "0.5.1",
+    "set-cookie-parser": "2.6.0",
+    "zod": "3.21.4",
+    "bcrypt-ts": "3.0.0"
   }
 }
