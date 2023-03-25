@@ -1,5 +1,6 @@
 export const TiiLogo = () => (
   <svg
+    class="h-12 w-12 bg-gray-700 p-1 rounded-full"
     xmlns="http://www.w3.org/2000/svg"
     id="emoji"
     viewBox="0 0 72 72"
