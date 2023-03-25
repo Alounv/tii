@@ -1,44 +1,32 @@
 import { component$ } from "@builder.io/qwik";
-import { QwikLogo } from "../icons/qwik";
+import { TiiLogo } from "../icons/tii";
 import styles from "./header.module.css";
-import { useAuthSession } from "~/routes/plugin@auth";
+import { useAuthSession, useAuthSignout } from "~/routes/plugin@auth";
+import { Form } from "@builder.io/qwik-city";
 
 export default component$(() => {
+  const logoutAction = useAuthSignout();
   const userSignal = useAuthSession();
+  const { user } = userSignal.value || {};
   return (
     <header class={styles.header}>
       <div class={styles.logo}>
-        <a href="/" title="qwik">
-          <QwikLogo />
+        <a href="/" title="tii">
+          <TiiLogo />
         </a>
       </div>
-      <ul>
-        <li>
-          <a
-            href="https://qwik.builder.io/docs/components/overview/"
-            target="_blank"
-          >
-            Docs
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://qwik.builder.io/examples/introduction/hello-world/"
-            target="_blank"
-          >
-            Examples
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://qwik.builder.io/tutorial/welcome/overview/"
-            target="_blank"
-          >
-            Tutorials
-          </a>
-        </li>
-        <li>{userSignal.value?.user?.name}</li>
-      </ul>
+      {user && (
+        <>
+          <div>{user?.name}</div>
+          <Form action={logoutAction}>
+            <div class="container">
+              <div class="login">
+                <button>Logout</button>
+              </div>
+            </div>
+          </Form>
+        </>
+      )}
     </header>
   );
 });
