@@ -45,7 +45,6 @@
     "@prisma/client": "4.11.0",
     "@auth/core": "0.5.1",
     "set-cookie-parser": "2.6.0",
-    "zod": "3.21.4",
-    "bcrypt-ts": "3.0.0"
+    "zod": "3.21.4"
   }
 }

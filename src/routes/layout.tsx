@@ -3,7 +3,6 @@ import { routeLoader$ } from "@builder.io/qwik-city";
 
 import Header from "~/components/starter/header/header";
 import Footer from "~/components/starter/footer/footer";
-import { useAuthSession } from "~/routes/plugin@auth";
 
 export const useServerTimeLoader = routeLoader$(() => {
   return {
@@ -12,9 +11,6 @@ export const useServerTimeLoader = routeLoader$(() => {
 });
 
 export default component$(() => {
-  const userSignal = useAuthSession();
-  console.log("userSignal", userSignal);
-
   return (
     <div class="page">
       <main>

@@ -5,19 +5,26 @@ import Counter from "~/components/starter/counter/counter";
 import Infobox from "~/components/starter/infobox/infobox";
 import Starter from "~/components/starter/next-steps/next-steps";
 import { Form } from "@builder.io/qwik-city";
-import { useAuthSignin } from "~/routes/plugin@auth";
+import {
+  useAuthSession,
+  useAuthSignin,
+  useAuthSignout,
+} from "~/routes/plugin@auth";
 
 export default component$(() => {
   const loginAction = useAuthSignin();
+  const logoutAction = useAuthSignout();
+  const userSignal = useAuthSession();
+  const { user } = userSignal.value;
 
   return (
     <>
       <div>
-        <Form action={loginAction}>
+        <Form action={user ? logoutAction : loginAction}>
           <div class="container">
-            <input type="hidden" name="provider" value="credentials" />
+            <input type="hidden" name="providerId" value="github" />
             <div class="login">
-              <button>Login</button>
+              <button>{user ? "Logout" : "Login"}</button>
             </div>
           </div>
         </Form>
