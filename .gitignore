@@ -42,3 +42,6 @@ lerna-debug.log*
 
 # Db
 prisma/dev.db
+
+# Vercel
+.vercel
