@@ -6,13 +6,13 @@
   },
   "private": true,
   "scripts": {
-    "build": "pnpm run prisma:generate && pnpm run prisma:migrate && pnpm qwik build",
+    "build": "npm run qwik build",
     "build.client": "vite build",
     "build.preview": "vite build --ssr src/entry.preview.tsx",
     "build.server": "vite build -c adapters/express/vite.config.ts",
     "build.types": "tsc --incremental --noEmit",
     "deploy": "node server/entry.express",
-    "deploy:railway": "ORIGIN=https://tii-production.up.railway.app/ node server/entry.express",
+    "deploy:fly": "ORIGIN=https://this-is-it.fly.dev/ node server/entry.express",
     "dev": "vite --mode ssr",
     "dev.debug": "node --inspect-brk ./node_modules/vite/bin/vite.js --mode ssr --force",
     "fmt": "prettier --write .",
@@ -20,6 +20,7 @@
     "lint": "eslint \"src/**/*.ts*\"",
     "preview": "qwik build preview && vite preview --open",
     "start": "vite --open --mode ssr",
+    "setup": "prisma:generate && prisma:migrate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "qwik": "qwik"
