@@ -1,8 +1,9 @@
 import { component$ } from "@builder.io/qwik";
 import { TiiLogo } from "../icons/tii";
 import Profile from "../profile";
+import type { User } from "@prisma/client";
 
-export default component$(() => {
+export default component$(({ user }: { user: User }) => {
   return (
     <nav class="bg-gray-800">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -25,7 +26,7 @@ export default component$(() => {
             </div>
           </div>
 
-          <Profile />
+          <Profile user={user} />
         </div>
       </div>
     </nav>

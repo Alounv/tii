@@ -1,13 +1,11 @@
 import { component$, useSignal, $, useOnDocument } from "@builder.io/qwik";
 import { Form } from "@builder.io/qwik-city";
 import { zUser } from "~/data/user";
-import { useAuthSession, useAuthSignout } from "~/routes/plugin@auth";
+import { useAuthSignout } from "~/routes/plugin@auth";
 
-export default component$(() => {
+export default component$(({ user }: { user: string }) => {
   const useMenu = useSignal(false);
   const logoutAction = useAuthSignout();
-  const userSignal = useAuthSession();
-  const { user } = userSignal.value || {};
 
   if (!user) return null;
   const { image } = zUser.parse(user);
