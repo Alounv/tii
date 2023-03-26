@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
-import { TiiLogo } from "../icons/tii";
-import Profile from "../profile";
+import { TiiLogo } from "./tii";
+import Profile from "./profile";
 import type { User } from "@prisma/client";
 
 export default component$(({ user }: { user: User | null }) => {

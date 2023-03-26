@@ -1,7 +1,7 @@
 import { component$, Slot } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 
-import Header from "~/components/header/header";
+import Header from "~/components/header";
 import { getUserFromCookie } from "~/data/user";
 
 export const useGetCurrentUser = routeLoader$(async ({ cookie }) => {
