@@ -1,35 +1,6 @@
-import type { ProfileCallback } from "@auth/core/providers";
-import type { GitHubProfile } from "@auth/core/providers/github";
 import GitHub from "@auth/core/providers/github";
 import { createUser, getUserByEmail } from "~/data/user";
 import { serverAuth$ } from "~/server/auth/auth";
-
-const githubCallback: ProfileCallback<GitHubProfile> = async ({
-  email,
-  login,
-  avatar_url,
-}) => {
-  if (!email) {
-    throw new Error("Email is required");
-  }
-
-  let user = await getUserByEmail(email);
-  if (user) {
-    console.info("Found user");
-  } else {
-    user = await createUser({ email, name: login, avatar_url });
-    console.info("Creates user");
-  }
-
-  console.info(user);
-
-  return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    image: user.avatar_url,
-  };
-};
 
 export const { useAuthSignin, useAuthSignout, useAuthSession, onRequest } =
   serverAuth$(() => {
@@ -41,8 +12,31 @@ export const { useAuthSignin, useAuthSignout, useAuthSession, onRequest } =
         GitHub({
           clientId: import.meta.env.VITE_GITHUB_ID!,
           clientSecret: import.meta.env.VITE_GITHUB_SECRET!,
-          profile: githubCallback,
         }),
       ],
+      callbacks: {
+        session: async ({ session, token }: { session: any; token: any }) => {
+          if (session?.user) {
+            session.user.id = token.sub;
+            const { email, login, avatar_url } = session.user;
+
+            const user = await getUserByEmail(email);
+            if (!user) {
+              await createUser({ email, name: login, avatar_url });
+              console.info("Creates user");
+            }
+          }
+          return session;
+        },
+        jwt: async ({ user, token }: { user: any; token: any }) => {
+          if (user) {
+            token.sub = user.id;
+          }
+          return token;
+        },
+      },
+      session: {
+        strategy: "jwt",
+      },
     };
   });

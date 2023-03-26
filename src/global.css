@@ -74,26 +74,6 @@ input[type="text"] {
   padding: 10px 20px;
 }
 
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: white;
-  color: var(--qwik-dark-purple);
-}
-
-button.small {
-  border-radius: 6px;
-  font-size: 0.8rem;
-  padding: 5px 10px;
-}
-
-button.gray {
-  border-color: #aaa;
-  color: #aaa;
-}
-
 .section.bright {
   background: white;
 }

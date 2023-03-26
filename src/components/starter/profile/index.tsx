@@ -1,14 +1,11 @@
 import { component$, useSignal, $, useOnDocument } from "@builder.io/qwik";
 import { Form } from "@builder.io/qwik-city";
-import { zUser } from "~/data/user";
+import type { User } from "@prisma/client";
 import { useAuthSignout } from "~/routes/plugin@auth";
 
-export default component$(({ user }: { user: string }) => {
+export default component$(({ user }: { user: User }) => {
   const useMenu = useSignal(false);
   const logoutAction = useAuthSignout();
-
-  if (!user) return null;
-  const { image } = zUser.parse(user);
 
   useOnDocument(
     "click",
@@ -39,7 +36,11 @@ export default component$(({ user }: { user: string }) => {
                 }}
               >
                 <span class="sr-only">Open user menu</span>
-                <img class="h-8 w-8 rounded-full" src={image} alt="" />
+                <img
+                  class="h-8 w-8 rounded-full"
+                  src={user.avatar_url || undefined}
+                  alt=""
+                />
               </button>
             </div>
 

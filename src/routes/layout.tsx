@@ -2,7 +2,11 @@ import { component$, Slot } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 
 import Header from "~/components/starter/header/header";
-import { useAuthSession } from "./plugin@auth";
+import { getUserFromCookie } from "~/data/user";
+
+export const useGetCurrentUser = routeLoader$(async ({ cookie }) => {
+  return getUserFromCookie(cookie);
+});
 
 export const useServerTimeLoader = routeLoader$(() => {
   return {
@@ -11,12 +15,10 @@ export const useServerTimeLoader = routeLoader$(() => {
 });
 
 export default component$(() => {
-  const userSignal = useAuthSession();
-  const { user } = userSignal.value || {};
-
+  const { value } = useGetCurrentUser();
   return (
     <div class="min-h-full">
-      <Header user={user} />
+      <Header user={value} />
       <main>
         <div class="mx-auto max-w-4xl p-8">
           <div class="py-6 sm:px-6 lg:px-8 overflow-hidden bg-white shadow rounded-lg min-h-full">

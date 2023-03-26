@@ -1,12 +1,8 @@
-import type { User } from "../server/db/client";
-import { prisma } from "../server/db/client";
+import { decode } from "@auth/core/jwt";
+import type { Cookie } from "@builder.io/qwik-city";
+import type { User } from "@prisma/client";
+import { prisma } from "~/server/db/client";
 import { z } from "zod";
-
-export const zUser = z.object({
-  email: z.string().email(),
-  name: z.string().optional(),
-  image: z.string().url().optional(),
-});
 
 export async function getUserByEmail(email: User["email"]) {
   return prisma.user.findUnique({ where: { email } });
@@ -23,3 +19,15 @@ export async function createUser({
 export async function deleteUserByEmail(email: User["email"]) {
   return prisma.user.delete({ where: { email } });
 }
+
+const authSecret = process.env.VITE_NEXTAUTH_SECRET;
+
+export const getUserFromCookie = async (cookie: Cookie) => {
+  const sessionToken = cookie.get("next-auth.session-token");
+  if (!sessionToken) return null;
+  const token = z.string().parse(sessionToken?.value);
+  const secret = z.string().parse(authSecret);
+  const decoded = await decode({ token, secret });
+  const email = decoded?.email;
+  return email ? getUserByEmail(email) : null;
+};

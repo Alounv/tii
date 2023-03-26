@@ -3,7 +3,7 @@ import { TiiLogo } from "../icons/tii";
 import Profile from "../profile";
 import type { User } from "@prisma/client";
 
-export default component$(({ user }: { user: User }) => {
+export default component$(({ user }: { user: User | null }) => {
   return (
     <nav class="bg-gray-800">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -26,7 +26,7 @@ export default component$(({ user }: { user: User }) => {
             </div>
           </div>
 
-          <Profile user={user} />
+          {user && <Profile user={user} />}
         </div>
       </div>
     </nav>

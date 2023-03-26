@@ -261,7 +261,6 @@ function serverAuthQrl(authOptions) {
   const useAuthSignout = actionQrl(
     /* @__PURE__ */ inlinedQrl(
       async ({ callbackUrl }, req) => {
-        console.log('Should log out')
         const [authOptions2] = useLexicalScope();
         callbackUrl ?? (callbackUrl = getCurrentPageForAction(req));
         const auth = await authOptions2(req);
