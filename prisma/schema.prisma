@@ -9,8 +9,21 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(uuid())
-  email    String  @unique
-  name     String?
+  id         String      @id @default(uuid())
+  email      String      @unique
+  name       String?
   avatar_url String?
+  Objective  Objective[]
+}
+
+model Objective {
+  id             String @id @default(uuid())
+  userId         String
+  user           User   @relation(fields: [userId], references: [id])
+  description    String
+  duration       Int
+  cost           Int
+  coach          String
+  motivation     String
+  motivation_url String
 }
