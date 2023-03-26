@@ -1,5 +1,12 @@
-import type { User } from "../server/db/client";
+import type { User } from "@prisma/client";
 import { prisma } from "../server/db/client";
+import { z } from "zod";
+
+export const zUser = z.object({
+  email: z.string().email(),
+  name: z.string().optional(),
+  image: z.string().url().optional(),
+});
 
 export async function getUserByEmail(email: User["email"]) {
   return prisma.user.findUnique({ where: { email } });

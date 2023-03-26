@@ -94,15 +94,6 @@ button.gray {
   color: #aaa;
 }
 
-a,
-a:active,
-a:visited,
-a:hover {
-  color: black;
-  font-weight: 400;
-  text-decoration: none;
-}
-
 .section.bright {
   background: white;
 }

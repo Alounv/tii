@@ -13,15 +13,22 @@ const githubCallback: ProfileCallback<GitHubProfile> = async ({
     throw new Error("Email is required");
   }
 
-  const foundUser = await getUserByEmail(email);
-  if (foundUser) {
-    console.info("Found user", email);
-    return foundUser;
+  let user = await getUserByEmail(email);
+  if (user) {
+    console.info("Found user");
+  } else {
+    user = await createUser({ email, name: login, avatar_url });
+    console.info("Creates user");
   }
 
-  console.info("Creates user", email);
-  const newUser = await createUser({ email, name: login, avatar_url });
-  return newUser;
+  console.info(user);
+
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    image: user.avatar_url,
+  };
 };
 
 export const { useAuthSignin, useAuthSignout, useAuthSession, onRequest } =
