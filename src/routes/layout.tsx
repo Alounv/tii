@@ -17,11 +17,11 @@ export const useServerTimeLoader = routeLoader$(() => {
 export default component$(() => {
   const { value } = useGetCurrentUser();
   return (
-    <div class="min-h-full">
+    <div class="min-h-full bg-white sm:bg-transparent">
       <Header user={value} />
       <main>
-        <div class="mx-auto max-w-4xl p-8">
-          <div class="py-6 sm:px-6 lg:px-8 overflow-hidden bg-white shadow rounded-lg min-h-full">
+        <div class="mx-auto max-w-4xl sm:p-8">
+          <div class="py-6 px-4 sm:px-6 lg:px-8 overflow-hidden bg-white sm:shadow rounded-lg min-h-full">
             <Slot />
           </div>
         </div>
