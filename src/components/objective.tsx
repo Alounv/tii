@@ -1,4 +1,4 @@
-import { Slot, component$ } from "@builder.io/qwik";
+import { Slot, component$, useSignal, useTask$ } from "@builder.io/qwik";
 import type { ActionStore } from "@builder.io/qwik-city";
 import { Form } from "@builder.io/qwik-city";
 import { Success } from "@prisma/client";
@@ -36,7 +36,10 @@ export default component$(
     );
 
     const successPassed = success.map((s) => ({ ...s, isPassed: true }));
-    successPassed.pop();
+    successPassed.sort((a, b) => a.date.getTime() - b.date.getTime());
+    if (todaySuccess) {
+      successPassed.pop();
+    }
 
     const remainingDays = duration - success.length - (todaySuccess ? 0 : 1);
 
@@ -65,19 +68,33 @@ export default component$(
     return (
       <div class="text-gray-600">
         <Section title="Objective">
-          <h1 class="text-4xl font-bold text-gray-800">{description}</h1>
+          <Editable
+            classes="text-4xl font-bold text-gray-800"
+            value={description}
+          />
           <div class="mt-6">
             <span class="text-lg">
-              For <span class="font-medium text-gray-800">{duration}</span>{" "}
+              For{" "}
+              <Editable
+                classes="font-medium text-gray-800 pl-1"
+                value={duration}
+              />{" "}
               days, save{" "}
-              <span class="font-medium text-gray-800">{`${dailySaving} €`}</span>{" "}
-              on each success.
+              <Editable
+                classes="font-medium text-gray-800 pl-1"
+                value={dailySaving}
+              />{" "}
+              € on each success.
             </span>
           </div>
 
           <div class="mt-12">
             <div>
-              Coached by: <span class="font-medium text-gray-800">{coach}</span>
+              Coached by:{" "}
+              <Editable
+                classes="font-medium text-gray-800 w-80"
+                value={coach}
+              />
             </div>
             <div class="rounded-xl p-8 bg-gray-50 border italic mt-4 text-lg text-gray-900 text-center">
               <div class="text-gray-300">Encouragement is loading...</div>
@@ -94,15 +111,25 @@ export default component$(
               )} %)`}</div>
             </div>
 
-            <div class="flex-1 p-2">
-              <div class="text-lg font-medium mb-4 text-gray-800">
-                {motivation}
+            <div class="flex flex-col flex-1 p-2 items-center">
+              <div class="mb-4">
+                <Editable
+                  rows={3}
+                  classes="text-lg font-medium mb-4 text-gray-800"
+                  value={motivation}
+                />
                 <span class="text-gray-400 text-sm">{` (${cost} €)`}</span>
               </div>
-              <div class="rounded-xl shadow drop-shadow-lg p-4 bg-gray-50 overflow-hidden">
+              <div class="rounded-xl shadow drop-shadow-lg p-4 bg-gray-50 overflow-hidden mb-2">
                 <img class="rounded-md" src={motivation_url} alt={motivation} />
                 <div class="absolute top-0 bottom-0 left-0 right-0 opacity-25 bg-white" />
               </div>
+              <Editable
+                rows={4}
+                classes="text-sm rounded text-gray-400"
+                label="change URL"
+                value={motivation_url}
+              />
             </div>
           </div>
         </Section>
@@ -180,11 +207,10 @@ const Success = component$(
         </label>
         <input
           id="today"
-          name="isDone"
           type="checkbox"
           disabled={!successAction}
           checked={isPassed}
-          class="h-8 w-8 rounded border-gray-300 text-sky-600 focus:ring-sky-600"
+          class={`h-8 w-8 rounded border-gray-300 text-sky-600 focus:ring-sky-600 disabled:opacity-50`}
           onChange$={async (event) => {
             // eslint-disable-next-line qwik/valid-lexical-scope
             await successAction?.submit({
@@ -197,3 +223,52 @@ const Success = component$(
     );
   }
 );
+
+const Editable = component$(({ value, classes, rows, label }: any) => {
+  const useIsEditable = useSignal(false);
+  const inputRef = useSignal<HTMLInputElement>();
+
+  useTask$(({ track }) => {
+    track(() => useIsEditable.value);
+    setTimeout(() => {
+      const input = inputRef.value;
+      input?.focus();
+    }, 50);
+  });
+
+  if (useIsEditable.value) {
+    const cls =
+      classes +
+      " border border-gray-400 rounded px-2" +
+      (rows ? " resize-none w-full" : " ");
+    const Element = rows ? "textarea" : "input";
+    return (
+      <Element
+        ref={inputRef}
+        class={cls}
+        value={value}
+        rows={rows}
+        onChange$={() => {
+          console.log("change");
+        }}
+        onBlur$={() => {
+          useIsEditable.value = false;
+        }}
+      />
+    );
+  }
+
+  return (
+    <span
+      class={
+        classes +
+        " cursor-pointer hover:bg-gray-100 hover:border-b border-gray-300 rounded"
+      }
+      onClick$={() => {
+        useIsEditable.value = true;
+      }}
+    >
+      {label || value}
+    </span>
+  );
+});
