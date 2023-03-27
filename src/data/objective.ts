@@ -23,7 +23,10 @@ export const createObjective = async ({
 export const getObjectiveFromUser = async ({
   userId,
 }: Pick<Objective, "userId">) => {
-  return prisma.objective.findFirst({ where: { userId } });
+  return prisma.objective.findFirst({
+    where: { userId },
+    include: { success: true },
+  });
 };
 
 export const deleteObjective = async (id: string) => {

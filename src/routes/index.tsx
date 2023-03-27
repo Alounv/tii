@@ -13,6 +13,7 @@ import {
   deleteObjective,
   getObjectiveFromUser,
 } from "~/data/objective";
+import { setTodaySuccess } from "~/data/success";
 import { getUserFromCookie } from "~/data/user";
 import { useAuthSession } from "~/routes/plugin@auth";
 
@@ -21,6 +22,7 @@ export default component$(() => {
   const { value: objective } = useGetUserObjective() || {};
   const createAction = useCreateObjective();
   const deleteAction = useDeleteObjective();
+  const successAction = useToggleTodaySuccess();
 
   if (!userSignal.value?.user) {
     return <Login />;
@@ -30,7 +32,13 @@ export default component$(() => {
     return <Welcome createAction={createAction} />;
   }
 
-  return <Objective objective={objective} deleteAction={deleteAction} />;
+  return (
+    <Objective
+      objective={objective}
+      deleteAction={deleteAction}
+      successAction={successAction}
+    />
+  );
 });
 
 export const head: DocumentHead = {
@@ -66,5 +74,16 @@ export const useDeleteObjective = routeAction$(
   },
   zod$({
     objectiveId: z.string(),
+  })
+);
+
+export const useToggleTodaySuccess = routeAction$(
+  async ({ objectiveId, isDone }) => {
+    await setTodaySuccess({ objectiveId, isDone });
+    return { success: true };
+  },
+  zod$({
+    objectiveId: z.string(),
+    isDone: z.boolean(),
   })
 );
