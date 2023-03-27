@@ -16,6 +16,17 @@ export async function createUser({
   return prisma.user.create({ data: { email, name, avatar_url } });
 }
 
+export async function updateUser({
+  email,
+  name,
+  avatar_url,
+}: Pick<User, "email" | "name" | "avatar_url">) {
+  return prisma.user.update({
+    where: { email },
+    data: { name, avatar_url },
+  });
+}
+
 export async function deleteUserByEmail(email: User["email"]) {
   return prisma.user.delete({ where: { email } });
 }
@@ -23,11 +34,14 @@ export async function deleteUserByEmail(email: User["email"]) {
 const authSecret = process.env.VITE_NEXTAUTH_SECRET;
 
 export const getUserFromCookie = async (cookie: Cookie) => {
-  const sessionToken = cookie.get("next-auth.session-token");
+  const sessionToken =
+    cookie.get("next-auth.session-token") ||
+    cookie.get("__Secure-next-auth.session-token");
+
   if (!sessionToken) return null;
   const token = z.string().parse(sessionToken?.value);
   const secret = z.string().parse(authSecret);
   const decoded = await decode({ token, secret });
   const email = decoded?.email;
-  return email ? getUserByEmail(email) : null;
+  return email ? await getUserByEmail(email) : null;
 };
