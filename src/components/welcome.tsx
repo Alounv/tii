@@ -1,5 +1,6 @@
 import { component$ } from "@builder.io/qwik";
-import { ActionStore, Form } from "@builder.io/qwik-city";
+import type { ActionStore } from "@builder.io/qwik-city";
+import { Form } from "@builder.io/qwik-city";
 import { useAuthSession } from "~/routes/plugin@auth";
 
 interface IWelcome {
