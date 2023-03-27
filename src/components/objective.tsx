@@ -50,16 +50,17 @@ export default component$(
       };
     });
 
-    const checkboxes: Pick<Success, "date" | "id">[] = [
-      ...successPassed,
-      {
-        id: "today",
-        date: today,
-        ...todaySuccess,
-        isPassed: todaySuccess ? true : false,
-      },
-      ...successToCome,
-    ];
+    const checkboxes: (Pick<Success, "date" | "id"> & { isPassed: boolean })[] =
+      [
+        ...successPassed,
+        {
+          id: "today",
+          date: today,
+          ...todaySuccess,
+          isPassed: todaySuccess ? true : false,
+        },
+        ...successToCome,
+      ];
 
     return (
       <div class="text-gray-600">
