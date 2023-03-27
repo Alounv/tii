@@ -19,18 +19,19 @@ model User {
 model Objective {
   id             String    @id @default(uuid())
   userId         String
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   description    String
   duration       Int
   cost           Int
   coach          String
   motivation     String
   motivation_url String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   success        Success[]
 }
 
 model Success {
   id          String    @id @default(uuid())
   objectiveId String
-  objective   Objective @relation(fields: [objectiveId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  objective   Objective @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+  date        DateTime @default(now())
 }
