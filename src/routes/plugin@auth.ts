@@ -1,5 +1,5 @@
 import GitHub from "@auth/core/providers/github";
-import { createUser, getUserByEmail, updateUser } from "~/data/user";
+import { createUser, getUserByEmail } from "~/data/user";
 import { serverAuth$ } from "~/server/auth/auth";
 
 export const { useAuthSignin, useAuthSignout, useAuthSession, onRequest } =
@@ -18,14 +18,15 @@ export const { useAuthSignin, useAuthSignout, useAuthSession, onRequest } =
         session: async ({ session, token }: { session: any; token: any }) => {
           if (session?.user) {
             session.user.id = token.sub;
-            const { email, login, avatar_url, picture } = session.user;
+            const { email, name, image } = session.user;
             const user = await getUserByEmail(email);
-            const action = user ? updateUser : createUser;
-            await action({
-              email,
-              name: login,
-              avatar_url: avatar_url || picture,
-            });
+            if (!user) {
+              await createUser({
+                email,
+                name,
+                avatar_url: image,
+              });
+            }
           }
           return session;
         },

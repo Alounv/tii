@@ -16,17 +16,6 @@ export async function createUser({
   return prisma.user.create({ data: { email, name, avatar_url } });
 }
 
-export async function updateUser({
-  email,
-  name,
-  avatar_url,
-}: Pick<User, "email" | "name" | "avatar_url">) {
-  return prisma.user.update({
-    where: { email },
-    data: { name, avatar_url },
-  });
-}
-
 export async function deleteUserByEmail(email: User["email"]) {
   return prisma.user.delete({ where: { email } });
 }
