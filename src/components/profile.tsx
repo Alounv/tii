@@ -3,7 +3,7 @@ import { Form } from "@builder.io/qwik-city";
 import type { User } from "@prisma/client";
 import { useAuthSignout } from "~/routes/plugin@auth";
 
-export default component$(({ user }: { user: User }) => {
+export const Profile = component$(({ user }: { user: User }) => {
   const useMenu = useSignal(false);
   const logoutAction = useAuthSignout();
 

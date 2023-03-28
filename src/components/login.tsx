@@ -1,19 +1,9 @@
 import { component$ } from "@builder.io/qwik";
-import { routeLoader$ } from "@builder.io/qwik-city";
 
 import { Form } from "@builder.io/qwik-city";
-import { getObjectiveFromUser } from "~/data/objective";
-import { getUserFromCookie } from "~/data/user";
 import { useAuthSignin } from "~/routes/plugin@auth";
 
-export const useGetUserObjective = routeLoader$(async ({ cookie }) => {
-  const user = await getUserFromCookie(cookie);
-  if (user) {
-    return getObjectiveFromUser({ userId: user.id });
-  }
-});
-
-export default component$(() => {
+export const Login = component$(() => {
   const loginAction = useAuthSignin();
 
   return (

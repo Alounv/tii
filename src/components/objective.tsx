@@ -3,6 +3,7 @@ import type { ActionStore } from "@builder.io/qwik-city";
 import { Form } from "@builder.io/qwik-city";
 import { Success } from "@prisma/client";
 import type { Objective } from "@prisma/client";
+import type { ObjectiveEditSchema } from "~/routes";
 
 interface IObjective {
   objective: Objective & { success: Success[] };
@@ -12,10 +13,11 @@ interface IObjective {
     { objectiveId: string; isDone: boolean },
     boolean
   >;
+  editAction: ActionStore<unknown, ObjectiveEditSchema, boolean>;
 }
 
-export default component$(
-  ({ objective, deleteAction, successAction }: IObjective) => {
+export const ObjectivePage = component$(
+  ({ objective, deleteAction, successAction, editAction }: IObjective) => {
     const {
       description,
       motivation,
@@ -68,42 +70,52 @@ export default component$(
     return (
       <div class="text-gray-600">
         <Section title="Objective">
-          <Editable
-            classes="text-4xl font-bold text-gray-800"
-            value={description}
-          />
-          <div class="mt-6">
-            <span class="text-lg">
-              For{" "}
-              <Editable
-                classes="font-medium text-gray-800 pl-1"
-                value={duration}
-              />{" "}
-              days, save{" "}
-              <Editable
-                classes="font-medium text-gray-800 pl-1"
-                value={dailySaving}
-              />{" "}
-              € on each success.
-            </span>
-          </div>
+          <Form action={editAction} class="flex flex-col">
+            <input type="hidden" name="id" value={objective.id} />
+            <Editable
+              classes="text-4xl font-bold text-gray-800"
+              name="description"
+              value={description}
+            />
+            <div class="mt-6">
+              <span class="text-lg">
+                For{" "}
+                <Editable
+                  classes="font-medium text-gray-800 pl-1"
+                  name="duration"
+                  type="number"
+                  value={duration.toString()}
+                />{" "}
+                days, save{" "}
+                <Editable
+                  classes="font-medium text-gray-800 pl-1"
+                  type="number"
+                  name="daily_saving"
+                  value={dailySaving.toString()}
+                />{" "}
+                € on each success.
+              </span>
+            </div>
 
-          <div class="mt-12">
-            <div>
-              Coached by:{" "}
-              <Editable
-                classes="font-medium text-gray-800 w-80"
-                value={coach}
-              />
+            <div class="mt-12">
+              <div>
+                Coached by:{" "}
+                <Editable
+                  classes="font-medium text-gray-800 w-80"
+                  name="coach"
+                  value={coach}
+                />
+              </div>
+              <div class="rounded-xl p-8 bg-gray-50 border italic mt-4 text-lg text-gray-900 text-center">
+                <div class="text-gray-300">Encouragement is loading...</div>
+              </div>
             </div>
-            <div class="rounded-xl p-8 bg-gray-50 border italic mt-4 text-lg text-gray-900 text-center">
-              <div class="text-gray-300">Encouragement is loading...</div>
-            </div>
-          </div>
+          </Form>
         </Section>
 
         <Section title="Reward">
-          <div class="flex">
+          <Form action={editAction} class="flex">
+            <input type="hidden" name="id" value={objective.id} />
             <div class="w-1/2 flex flex-col gap-6 items-center justify-center">
               <div class="text-5xl">{`${Math.round(cost * progress)} €`}</div>
               <div class="text-gray-400">{`already saved (${Math.round(
@@ -116,6 +128,7 @@ export default component$(
                 <Editable
                   rows={3}
                   classes="text-lg font-medium mb-4 text-gray-800"
+                  name="motivation"
                   value={motivation}
                 />
                 <span class="text-gray-400 text-sm">{` (${cost} €)`}</span>
@@ -128,10 +141,11 @@ export default component$(
                 rows={4}
                 classes="text-sm rounded text-gray-400"
                 label="change URL"
+                name="motivation_url"
                 value={motivation_url}
               />
             </div>
-          </div>
+          </Form>
         </Section>
 
         <Section title="Progress">
@@ -224,51 +238,67 @@ const Success = component$(
   }
 );
 
-const Editable = component$(({ value, classes, rows, label }: any) => {
-  const useIsEditable = useSignal(false);
-  const inputRef = useSignal<HTMLInputElement>();
+interface IEditable {
+  value: string;
+  classes: string;
+  rows?: number;
+  label?: string;
+  name: string;
+  type?: string;
+}
 
-  useTask$(({ track }) => {
-    track(() => useIsEditable.value);
-    setTimeout(() => {
-      const input = inputRef.value;
-      input?.focus();
-    }, 50);
-  });
+const Editable = component$(
+  ({ value, classes, rows, label, name, type }: IEditable) => {
+    const useIsEdited = useSignal(false);
+    const isEdited = useIsEdited.value;
+    const inputRef = useSignal<HTMLInputElement>();
+    const submitRef = useSignal<HTMLButtonElement>();
 
-  if (useIsEditable.value) {
-    const cls =
+    useTask$(({ track }) => {
+      track(() => useIsEdited.value);
+      setTimeout(() => {
+        const input = inputRef.value;
+        input?.focus?.();
+      }, 50);
+      if (useIsEdited.value === false) {
+        submitRef.value?.click();
+      }
+    });
+
+    const inputCls =
       classes +
       " border border-gray-400 rounded px-2" +
       (rows ? " resize-none w-full" : " ");
+
+    const spanCls =
+      classes +
+      " cursor-pointer hover:bg-gray-100 hover:border-b border-gray-300 rounded";
+
     const Element = rows ? "textarea" : "input";
+
     return (
-      <Element
-        ref={inputRef}
-        class={cls}
-        value={value}
-        rows={rows}
-        onChange$={() => {
-          console.log("change");
-        }}
-        onBlur$={() => {
-          useIsEditable.value = false;
-        }}
-      />
+      <>
+        <Element
+          ref={inputRef}
+          name={name}
+          type={type}
+          class={isEdited ? inputCls : "hidden"}
+          value={value}
+          rows={rows}
+          onBlur$={() => {
+            useIsEdited.value = false;
+          }}
+        />
+        <span
+          class={isEdited ? "hidden" : spanCls}
+          onClick$={() => {
+            useIsEdited.value = true;
+          }}
+        >
+          {label || value}
+        </span>
+        <button type="submit" class="hidden" ref={submitRef} />
+      </>
     );
   }
-
-  return (
-    <span
-      class={
-        classes +
-        " cursor-pointer hover:bg-gray-100 hover:border-b border-gray-300 rounded"
-      }
-      onClick$={() => {
-        useIsEditable.value = true;
-      }}
-    >
-      {label || value}
-    </span>
-  );
-});
+);

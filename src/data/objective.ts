@@ -20,6 +20,14 @@ export const createObjective = async ({
   return objective;
 };
 
+export const updateObjective = async (partialObjective: Partial<Objective>) => {
+  const objective = await prisma.objective.update({
+    where: { id: partialObjective.id },
+    data: partialObjective,
+  });
+  return objective;
+};
+
 export const getObjectiveFromUser = async ({
   userId,
 }: Pick<Objective, "userId">) => {

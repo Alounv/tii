@@ -5,13 +5,14 @@ import { zod$ } from "@builder.io/qwik-city";
 import { routeAction$ } from "@builder.io/qwik-city";
 import { routeLoader$ } from "@builder.io/qwik-city";
 
-import Login from "~/components/login";
-import Objective from "~/components/objective";
-import Welcome from "~/components/welcome";
+import { Login } from "~/components/login";
+import { ObjectivePage } from "~/components/objective";
+import { Welcome } from "~/components/welcome";
 import {
   createObjective,
   deleteObjective,
   getObjectiveFromUser,
+  updateObjective,
 } from "~/data/objective";
 import { setTodaySuccess } from "~/data/success";
 import { getUserFromCookie } from "~/data/user";
@@ -23,6 +24,7 @@ export default component$(() => {
   const createAction = useCreateObjective();
   const deleteAction = useDeleteObjective();
   const successAction = useToggleTodaySuccess();
+  const editAction = useEditObjective();
 
   if (!userSignal.value?.user) {
     return <Login />;
@@ -33,10 +35,11 @@ export default component$(() => {
   }
 
   return (
-    <Objective
+    <ObjectivePage
       objective={objective}
       deleteAction={deleteAction}
       successAction={successAction}
+      editAction={editAction}
     />
   );
 });
@@ -76,6 +79,30 @@ export const useDeleteObjective = routeAction$(
     objectiveId: z.string(),
   })
 );
+
+const objectiveEditSchema = z.object({
+  id: z.string(),
+  description: z.string().optional(),
+  duration: z.string().optional(),
+  daily_saving: z.string().optional(),
+  coach: z.string().optional(),
+  motivation: z.string().optional(),
+  motivation_url: z.string().optional(),
+});
+
+export type ObjectiveEditSchema = z.infer<typeof objectiveEditSchema>;
+
+export const useEditObjective = routeAction$(async (input) => {
+  const { duration: stringDuration, daily_saving, ...rest } = input;
+
+  const duration = stringDuration ? parseInt(stringDuration) : undefined;
+  const cost = daily_saving
+    ? parseInt(daily_saving) * (duration || 0)
+    : undefined;
+
+  await updateObjective({ duration, cost, ...rest });
+  return { success: true };
+}, zod$(objectiveEditSchema));
 
 export const useToggleTodaySuccess = routeAction$(
   async ({ objectiveId, isDone }) => {

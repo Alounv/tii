@@ -7,7 +7,7 @@ interface IWelcome {
   createAction: ActionStore<unknown, {}, boolean>;
 }
 
-export default component$(({ createAction }: IWelcome) => {
+export const Welcome = component$(({ createAction }: IWelcome) => {
   const userSignal = useAuthSession();
   const { user } = userSignal.value || {};
 
