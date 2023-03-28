@@ -4,9 +4,11 @@ import { z } from "@builder.io/qwik-city";
 import { zod$ } from "@builder.io/qwik-city";
 import { routeAction$ } from "@builder.io/qwik-city";
 import { routeLoader$ } from "@builder.io/qwik-city";
-
+import { DangerSection } from "~/components/danger";
 import { Login } from "~/components/login";
-import { ObjectivePage } from "~/components/objective";
+import { ObjectiveSection } from "~/components/objective";
+import { ProgressSection } from "~/components/progress";
+import { RewardSection } from "~/components/reward";
 import { Welcome } from "~/components/welcome";
 import {
   createObjective,
@@ -35,12 +37,12 @@ export default component$(() => {
   }
 
   return (
-    <ObjectivePage
-      objective={objective}
-      deleteAction={deleteAction}
-      successAction={successAction}
-      editAction={editAction}
-    />
+    <div class="text-gray-600">
+      <ObjectiveSection objective={objective} editAction={editAction} />
+      <RewardSection objective={objective} editAction={editAction} />
+      <ProgressSection objective={objective} successAction={successAction} />
+      <DangerSection deleteAction={deleteAction} objectiveId={objective.id} />
+    </div>
   );
 });
 

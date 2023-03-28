@@ -34,7 +34,7 @@ export const Editable = component$(
 
     const spanCls =
       classes +
-      " cursor-pointer hover:bg-gray-100 hover:border-b border-gray-300 rounded";
+      " cursor-pointer hover:bg-yellow-100 hover:border-b border-yellow-400 rounded";
 
     const Element = rows ? "textarea" : "input";
 
