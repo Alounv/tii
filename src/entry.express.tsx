@@ -29,7 +29,8 @@ const distDir = join(fileURLToPath(import.meta.url), "..", "..", "dist");
 const buildDir = join(distDir, "build");
 
 // Allow for dynamic port
-const PORT = process.env.PORT ?? 3000;
+const PORT = parseInt(process.env.PORT || "8080");
+const HOST = process.env.HOST ?? "0.0.0.0";
 
 // Create the Qwik City express middleware
 const { router, notFound } = createQwikCity({ render, qwikCityPlan, manifest });
@@ -53,7 +54,7 @@ app.use(router);
 app.use(notFound);
 
 // Start the express server
-app.listen(PORT, () => {
+app.listen(PORT, HOST, () => {
   /* eslint-disable */
   console.log(`Server starter: http://localhost:${PORT}/`);
 });

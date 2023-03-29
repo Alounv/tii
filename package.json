@@ -12,7 +12,7 @@
     "build.server": "vite build -c adapters/express/vite.config.ts",
     "build.types": "tsc --incremental --noEmit",
     "deploy": "node server/entry.express",
-    "deploy:fly": "ORIGIN=https://this-is-it.fly.dev/ node server/entry.express",
+    "deploy:fly": "ORIGIN=https://this-is-it.fly.dev/ node server/entry.express --host 0.0.0.0 --port 8080",
     "dev": "vite --mode ssr",
     "dev.debug": "node --inspect-brk ./node_modules/vite/bin/vite.js --mode ssr --force",
     "fmt": "prettier --write .",
