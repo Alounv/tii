@@ -19,10 +19,21 @@ export const RewardSection = component$(
 
     return (
       <Section title="Reward">
-        <Form action={editAction} class="flex">
+        <Form
+          action={editAction}
+          class="flex flex-col-reverse sm:flex-row justify-center items-center"
+        >
           <input type="hidden" name="id" value={objective.id} />
           <div class="w-1/2 flex flex-col gap-6 items-center justify-center">
-            <div class="text-5xl">{`${Math.round(cost * progress)} €`}</div>
+            <div class="relative h-20 flex items-center justify-center p-8 py-14 rounded-xl overflow-hidden bg-gray-100 shadow-inner w-56">
+              <div
+                class="bg-sky-500 h-full absolute top-0 left-0 bottom-0"
+                style={`width: ${progress * 100}%`}
+              />
+              <div class="text-5xl relative font-semibold text-gray-800">{`${Math.round(
+                cost * progress
+              )} €`}</div>
+            </div>
             <div class="text-gray-400">{`already saved (${Math.round(
               progress * 100
             )} %)`}</div>

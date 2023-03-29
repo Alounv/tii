@@ -1,35 +1,38 @@
 import { component$ } from "@builder.io/qwik";
 import type { ActionStore } from "@builder.io/qwik-city";
+import type { SetSuccessSchema } from "~/routes";
 
 interface ISuccess {
   isPassed: boolean;
+  isFailed: boolean;
   date: Date;
   objectiveId: string;
-  successAction?: ActionStore<
-    unknown,
-    { objectiveId: string; isDone: boolean },
-    boolean
-  >;
+  successAction?: ActionStore<unknown, SetSuccessSchema, boolean>;
 }
 
 export const SuccessCheckbox = component$(
-  ({ isPassed, date, successAction, objectiveId }: ISuccess) => {
-    const formattedDate = `${date.getDate()} / ${date.getMonth()}`;
+  ({ isPassed, isFailed, date, successAction, objectiveId }: ISuccess) => {
+    const day = date.getDate();
+    const month = date.getMonth();
+    const isDisabled = !successAction;
     return (
       <div class="flex-shrink-0 flex flex-col items-center gap-2">
         <label class="text-sm text-gray-400 cursor-pointer" for="today">
-          {formattedDate}
+          <strong class="text-gray-600">{day}</strong> / <span>{month}</span>
         </label>
         <input
           id="today"
           type="checkbox"
-          disabled={!successAction}
+          disabled={isDisabled}
           checked={isPassed}
-          class={`h-8 w-8 rounded border-gray-300 text-sky-600 focus:ring-sky-600 disabled:opacity-50`}
+          class={`h-8 w-8 rounded disabled:border-gray-300 border-gray-500 text-sky-600 disabled:text-sky-500 focus:ring-sky-600 ${
+            isFailed ? " bg-gray-300" : ""
+          } ${isDisabled ? "" : " shadow-lg drop-shadow-lg"}}`}
           onChange$={async (event) => {
             // eslint-disable-next-line qwik/valid-lexical-scope
             await successAction?.submit({
               objectiveId,
+              date: date.toString(),
               isDone: event.target.checked,
             });
           }}

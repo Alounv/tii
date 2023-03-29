@@ -1,33 +1,27 @@
 import type { Success } from "@prisma/client";
 import { prisma } from "~/server/db/client";
+import { getIsTheSameDay } from "~/utilities/date";
 
-export const setTodaySuccess = async ({
+export const setSuccess = async ({
   objectiveId,
+  date,
   isDone,
-}: Pick<Success, "objectiveId"> & { isDone: boolean }) => {
-  const date = new Date();
-  const startOfDay = new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate()
-  );
-
-  const todaySuccess = await prisma.success.findMany({
-    where: { objectiveId, date: { gte: startOfDay } },
-    select: { id: true },
+}: Pick<Success, "objectiveId" | "date"> & { isDone: boolean }) => {
+  const success = await prisma.success.findMany({
+    where: { objectiveId },
+    orderBy: { date: "desc" },
   });
 
-  const ids = todaySuccess.map((s) => s.id);
+  const currentSuccess = success.find((s) => getIsTheSameDay(s.date, date));
 
-  if (ids.length && !isDone) {
-    const success = await prisma.success.deleteMany({
-      where: { id: { in: ids } },
+  if (currentSuccess && !isDone) {
+    const success = await prisma.success.delete({
+      where: { id: currentSuccess.id },
     });
     return success;
   }
 
-  const success = await prisma.success.create({
+  return prisma.success.create({
     data: { date, objectiveId },
   });
-  return success;
 };

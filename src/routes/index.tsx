@@ -16,7 +16,7 @@ import {
   getObjectiveFromUser,
   updateObjective,
 } from "~/data/objective";
-import { setTodaySuccess } from "~/data/success";
+import { setSuccess } from "~/data/success";
 import { getUserFromCookie } from "~/data/user";
 import { useAuthSession } from "~/routes/plugin@auth";
 
@@ -106,13 +106,18 @@ export const useEditObjective = routeAction$(async (input) => {
   return { success: true };
 }, zod$(objectiveEditSchema));
 
+const setSuccessSchema = z.object({
+  objectiveId: z.string(),
+  isDone: z.boolean(),
+  date: z.string(),
+});
+
+export type SetSuccessSchema = z.infer<typeof setSuccessSchema>;
+
 export const useToggleTodaySuccess = routeAction$(
-  async ({ objectiveId, isDone }) => {
-    await setTodaySuccess({ objectiveId, isDone });
+  async ({ objectiveId, isDone, date }) => {
+    await setSuccess({ objectiveId, isDone, date: new Date(date) });
     return { success: true };
   },
-  zod$({
-    objectiveId: z.string(),
-    isDone: z.boolean(),
-  })
+  zod$(setSuccessSchema)
 );
