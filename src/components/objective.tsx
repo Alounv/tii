@@ -49,7 +49,7 @@ export const ObjectiveSection = component$(
           </div>
 
           <div class="mt-12">
-            <div class="flex gap-2">
+            <div class="flex gap-2 items-center">
               Coached by:{" "}
               <Editable
                 classes="font-medium text-gray-800 w-80 flex-shrink-0"
@@ -67,7 +67,7 @@ export const ObjectiveSection = component$(
                 new encouragement
               </button>
             </div>
-            <div class="rounded-xl p-8 bg-gray-50 border italic mt-4 text-lg text-gray-900 text-center">
+            <div class="rounded-xl p-8 bg-gray-50 border italic mt-2 text-lg text-gray-900 text-center">
               <div
                 class={
                   encouragement
