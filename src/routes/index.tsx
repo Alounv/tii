@@ -1,4 +1,4 @@
-import { component$ } from "@builder.io/qwik";
+import { component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 import { z } from "@builder.io/qwik-city";
 import { zod$ } from "@builder.io/qwik-city";
@@ -19,14 +19,32 @@ import {
 import { setSuccess } from "~/data/success";
 import { getUserFromCookie } from "~/data/user";
 import { useAuthSession } from "~/routes/plugin@auth";
+import { getEncouragement } from "~/server/encouragement";
+import { eraseCookie, setCookie } from "~/utilities/cookie";
 
 export default component$(() => {
   const userSignal = useAuthSession();
-  const { value: objective } = useGetUserObjective() || {};
+  const { value: objectiveValue } = useGetUserObjective() || {};
+  const { objective } = objectiveValue || {};
   const createAction = useCreateObjective();
   const deleteAction = useDeleteObjective();
   const successAction = useToggleTodaySuccess();
   const editAction = useEditObjective();
+  const encouragement = useSignal<string>("");
+
+  useVisibleTask$(({ track }) => {
+    track(() => objectiveValue);
+    if (objectiveValue?.encouragement) {
+      sessionStorage.setItem("encouragement", objectiveValue.encouragement);
+      setCookie("encouragement", "true", 1);
+      encouragement.value = objectiveValue.encouragement;
+    } else {
+      encouragement.value = sessionStorage.getItem("encouragement") || "";
+      if (!encouragement.value) {
+        eraseCookie("encouragement");
+      }
+    }
+  });
 
   if (!userSignal.value?.user) {
     return <Login />;
@@ -38,7 +56,11 @@ export default component$(() => {
 
   return (
     <div class="text-gray-600">
-      <ObjectiveSection objective={objective} editAction={editAction} />
+      <ObjectiveSection
+        objective={objective}
+        encouragement={encouragement.value}
+        editAction={editAction}
+      />
       <RewardSection objective={objective} editAction={editAction} />
       <ProgressSection objective={objective} successAction={successAction} />
       <DangerSection deleteAction={deleteAction} objectiveId={objective.id} />
@@ -59,7 +81,20 @@ export const head: DocumentHead = {
 export const useGetUserObjective = routeLoader$(async ({ cookie }) => {
   const user = await getUserFromCookie(cookie);
   if (user) {
-    return getObjectiveFromUser({ userId: user.id });
+    const objective = await getObjectiveFromUser({ userId: user.id });
+    if (objective) {
+      const isEncouragementGenerated = cookie.get("encouragement");
+      if (isEncouragementGenerated) {
+        return { objective };
+      }
+
+      console.log("Generating encouragement");
+      const encouragement = await getEncouragement({
+        objective,
+        user,
+      });
+      return { objective, encouragement };
+    }
   }
 });
 
@@ -79,7 +114,7 @@ export const useDeleteObjective = routeAction$(
   },
   zod$({
     objectiveId: z.string(),
-  })
+  }),
 );
 
 const objectiveEditSchema = z.object({
@@ -119,5 +154,5 @@ export const useToggleTodaySuccess = routeAction$(
     await setSuccess({ objectiveId, isDone, date: new Date(date) });
     return { success: true };
   },
-  zod$(setSuccessSchema)
+  zod$(setSuccessSchema),
 );
