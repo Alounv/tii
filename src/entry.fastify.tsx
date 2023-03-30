@@ -23,7 +23,6 @@ const buildDir = join(distDir, "build");
 
 // Allow for dynamic port
 const PORT = parseInt(process.env.PORT ?? "8080");
-const HOST = process.env.HOST ?? "0.0.0.0";
 
 const start = async () => {
   // Create the fastify server
@@ -41,11 +40,13 @@ const start = async () => {
   await fastify.register(FastifyQwik, { distDir, buildDir });
 
   // Start the fastify server
-  await fastify.listen({ port: PORT, host: HOST }, (err, address) => {
+  fastify.listen({ port: PORT, host: "0.0.0.0" }, (err, address) => {
     if (err) {
-      fastify.log.error(address, err);
+      fastify.log.error(err);
       process.exit(1);
     }
+
+    console.log(`Server listening at ${address}`);
   });
 };
 
