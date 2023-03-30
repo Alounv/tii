@@ -16,25 +16,33 @@ export const { useAuthSignin, useAuthSignout, useAuthSession, onRequest } =
       ],
       callbacks: {
         session: async ({ session, token }: { session: any; token: any }) => {
-          if (session?.user) {
-            session.user.id = token.sub;
-            const { email, name, image } = session.user;
-            const user = await getUserByEmail(email);
-            if (!user) {
-              await createUser({
-                email,
-                name,
-                avatar_url: image,
-              });
+          try {
+            if (session?.user) {
+              session.user.id = token.sub;
+              const { email, name, image } = session.user;
+              const user = await getUserByEmail(email);
+              if (!user) {
+                await createUser({
+                  email,
+                  name,
+                  avatar_url: image,
+                });
+              }
             }
+            return session;
+          } catch (error) {
+            console.error(error);
           }
-          return session;
         },
         jwt: async ({ user, token }: { user: any; token: any }) => {
-          if (user) {
-            token.sub = user.id;
+          try {
+            if (user) {
+              token.sub = user.id;
+            }
+            return token;
+          } catch (error) {
+            console.error(error);
           }
-          return token;
         },
       },
       session: {

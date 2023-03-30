@@ -1,13 +1,10 @@
 import { component$ } from "@builder.io/qwik";
-import type { ActionStore } from "@builder.io/qwik-city";
 import { Form } from "@builder.io/qwik-city";
+import { useCreateObjective } from "~/routes";
 import { useAuthSession } from "~/routes/plugin@auth";
 
-interface IWelcome {
-  createAction: ActionStore<unknown, {}, boolean>;
-}
-
-export const Welcome = component$(({ createAction }: IWelcome) => {
+export const Welcome = component$(() => {
+  const createAction = useCreateObjective();
   const userSignal = useAuthSession();
   const { user } = userSignal.value || {};
 

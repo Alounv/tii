@@ -1,4 +1,4 @@
-import { component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 import { z } from "@builder.io/qwik-city";
 import { zod$ } from "@builder.io/qwik-city";
@@ -20,50 +20,25 @@ import { setSuccess } from "~/data/success";
 import { getUserFromCookie } from "~/data/user";
 import { useAuthSession } from "~/routes/plugin@auth";
 import { getEncouragement } from "~/server/encouragement";
-import { eraseCookie, setCookie } from "~/utilities/cookie";
 
 export default component$(() => {
   const userSignal = useAuthSession();
-  const { value: objectiveValue } = useGetUserObjective() || {};
-  const { objective } = objectiveValue || {};
-  const createAction = useCreateObjective();
-  const deleteAction = useDeleteObjective();
-  const successAction = useToggleTodaySuccess();
-  const editAction = useEditObjective();
-  const encouragement = useSignal<string>("");
-
-  useVisibleTask$(({ track }) => {
-    track(() => objectiveValue);
-    if (objectiveValue?.encouragement) {
-      sessionStorage.setItem("encouragement", objectiveValue.encouragement);
-      setCookie("encouragement", "true", 1);
-      encouragement.value = objectiveValue.encouragement;
-    } else {
-      encouragement.value = sessionStorage.getItem("encouragement") || "";
-      if (!encouragement.value) {
-        eraseCookie("encouragement");
-      }
-    }
-  });
+  const { value: objective } = useGetUserObjective() || {};
 
   if (!userSignal.value?.user) {
     return <Login />;
   }
 
   if (!objective) {
-    return <Welcome createAction={createAction} />;
+    return <Welcome />;
   }
 
   return (
     <div class="text-gray-600">
-      <ObjectiveSection
-        objective={objective}
-        encouragement={encouragement.value}
-        editAction={editAction}
-      />
-      <RewardSection objective={objective} editAction={editAction} />
-      <ProgressSection objective={objective} successAction={successAction} />
-      <DangerSection deleteAction={deleteAction} objectiveId={objective.id} />
+      <ObjectiveSection objective={objective} />
+      <RewardSection objective={objective} />
+      <ProgressSection objective={objective} />
+      <DangerSection objectiveId={objective.id} />
     </div>
   );
 });
@@ -79,38 +54,61 @@ export const head: DocumentHead = {
 };
 
 export const useGetUserObjective = routeLoader$(async ({ cookie }) => {
-  const user = await getUserFromCookie(cookie);
-  if (user) {
-    const objective = await getObjectiveFromUser({ userId: user.id });
-    if (objective) {
-      const isEncouragementGenerated = cookie.get("encouragement");
-      if (isEncouragementGenerated) {
-        return { objective };
-      }
-
-      console.log("Generating encouragement");
-      const encouragement = await getEncouragement({
-        objective,
-        user,
-      });
-      return { objective, encouragement };
+  try {
+    const user = await getUserFromCookie(cookie);
+    if (user) {
+      return getObjectiveFromUser({ userId: user.id });
     }
+  } catch (e) {
+    console.error(e);
+  }
+});
+
+export const useGetUserEncouragement = routeLoader$(async ({ cookie }) => {
+  try {
+    const user = await getUserFromCookie(cookie);
+    if (user) {
+      const objective = await getObjectiveFromUser({ userId: user.id });
+      if (objective) {
+        const isEncouragementGenerated = cookie.get("encouragement");
+        if (isEncouragementGenerated) return "";
+
+        console.log("Generating encouragement");
+        const encouragement = await getEncouragement({
+          objective,
+          user,
+        });
+        return encouragement;
+      }
+    }
+  } catch (e) {
+    console.error(e);
   }
 });
 
 export const useCreateObjective = routeAction$(async (_, { cookie }) => {
-  const user = await getUserFromCookie(cookie);
-  if (!user) {
-    return { success: false, error: "You must login to create an objective" };
+  try {
+    const user = await getUserFromCookie(cookie);
+    if (!user) {
+      return { success: false, error: "You must login to create an objective" };
+    }
+    const objective = await createObjective({ userId: user.id });
+    return { success: true, objective };
+  } catch (e) {
+    console.error(e);
+    return { success: false, error: "error" };
   }
-  const objective = await createObjective({ userId: user.id });
-  return { success: true, objective };
 });
 
 export const useDeleteObjective = routeAction$(
   async ({ objectiveId }) => {
-    await deleteObjective(objectiveId);
-    return { success: true };
+    try {
+      await deleteObjective(objectiveId);
+      return { success: true };
+    } catch (e) {
+      console.error(e);
+      return { success: false, error: "error" };
+    }
   },
   zod$({
     objectiveId: z.string(),
@@ -130,15 +128,20 @@ const objectiveEditSchema = z.object({
 export type ObjectiveEditSchema = z.infer<typeof objectiveEditSchema>;
 
 export const useEditObjective = routeAction$(async (input) => {
-  const { duration: stringDuration, daily_saving, ...rest } = input;
+  try {
+    const { duration: stringDuration, daily_saving, ...rest } = input;
 
-  const duration = stringDuration ? parseInt(stringDuration) : undefined;
-  const cost = daily_saving
-    ? parseInt(daily_saving) * (duration || 0)
-    : undefined;
+    const duration = stringDuration ? parseInt(stringDuration) : undefined;
+    const cost = daily_saving
+      ? parseInt(daily_saving) * (duration || 0)
+      : undefined;
 
-  await updateObjective({ duration, cost, ...rest });
-  return { success: true };
+    await updateObjective({ duration, cost, ...rest });
+    return { success: true };
+  } catch (e) {
+    console.error(e);
+    return { success: false, error: "error" };
+  }
 }, zod$(objectiveEditSchema));
 
 const setSuccessSchema = z.object({
@@ -151,8 +154,13 @@ export type SetSuccessSchema = z.infer<typeof setSuccessSchema>;
 
 export const useToggleTodaySuccess = routeAction$(
   async ({ objectiveId, isDone, date }) => {
-    await setSuccess({ objectiveId, isDone, date: new Date(date) });
-    return { success: true };
+    try {
+      await setSuccess({ objectiveId, isDone, date: new Date(date) });
+      return { success: true };
+    } catch (e) {
+      console.error(e);
+      return { success: false, error: "error" };
+    }
   },
   zod$(setSuccessSchema),
 );

@@ -1,20 +1,39 @@
-import { component$ } from "@builder.io/qwik";
-import type { ActionStore } from "@builder.io/qwik-city";
+import { component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
 import { Form } from "@builder.io/qwik-city";
 import type { Objective, Success } from "@prisma/client";
-import type { ObjectiveEditSchema } from "~/routes";
 import { Editable } from "./editable";
 import { Section } from "./section";
-import { eraseCookie } from "~/utilities/cookie";
+import { eraseCookie, setCookie } from "~/utilities/cookie";
+import { useEditObjective, useGetUserEncouragement } from "~/routes";
 
 interface IObjectiveSection {
   objective: Objective & { success: Success[] };
-  encouragement: string;
-  editAction: ActionStore<unknown, ObjectiveEditSchema, boolean>;
 }
 
 export const ObjectiveSection = component$(
-  ({ objective, editAction, encouragement }: IObjectiveSection) => {
+  ({ objective }: IObjectiveSection) => {
+    const { value: encouragementValue } = useGetUserEncouragement() || {};
+    const editAction = useEditObjective();
+    const encouragement = useSignal<string>("");
+
+    useVisibleTask$(({ track }) => {
+      try {
+        track(() => encouragementValue);
+        if (encouragementValue) {
+          sessionStorage.setItem("encouragement", encouragementValue);
+          setCookie("encouragement", "true", 1);
+          encouragement.value = encouragementValue;
+        } else {
+          encouragement.value = sessionStorage.getItem("encouragement") || "";
+          if (!encouragement.value) {
+            eraseCookie("encouragement");
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    });
+
     const { description, coach, duration, cost } = objective;
 
     const dailySaving = Math.round(cost / duration);

@@ -1,10 +1,9 @@
 import { component$ } from "@builder.io/qwik";
-import type { ActionStore } from "@builder.io/qwik-city";
 import type { Objective, Success } from "@prisma/client";
 import { Section } from "./section";
 import { SuccessCheckbox } from "./success";
 import { getIsTheSameDay, getIsToday, getIsYesterday } from "~/utilities/date";
-import type { SetSuccessSchema } from "~/routes";
+import { useToggleTodaySuccess } from "~/routes";
 
 const getNumberOfBoxes = (duration: number, success: Success[]) => {
   const now = new Date();
@@ -49,38 +48,34 @@ const getCheckboxes = ({
 
 interface IProgressSection {
   objective: Objective & { success: Success[] };
-  successAction: ActionStore<unknown, SetSuccessSchema, boolean>;
 }
 
-export const ProgressSection = component$(
-  ({ objective, successAction }: IProgressSection) => {
-    const { duration, success } = objective;
-    const { pastDaysCount, boxesCount } = getNumberOfBoxes(duration, success);
-    const checkboxes = getCheckboxes({ success, boxesCount, pastDaysCount });
+export const ProgressSection = component$(({ objective }: IProgressSection) => {
+  const successAction = useToggleTodaySuccess();
+  const { duration, success } = objective;
+  const { pastDaysCount, boxesCount } = getNumberOfBoxes(duration, success);
+  const checkboxes = getCheckboxes({ success, boxesCount, pastDaysCount });
 
-    return (
-      <Section title="Progress">
-        <div class="p-6 flex gap-4 flex-wrap">
-          {checkboxes.map((s) => {
-            const isToday = getIsToday(s.date);
-            const isYesterday = getIsYesterday(s.date);
-            const isInThePast =
-              !isToday && s.date.getTime() < new Date().getTime();
-            return (
-              <SuccessCheckbox
-                key={s.id}
-                isPassed={s.isPassed}
-                isFailed={isInThePast && !s.isPassed}
-                date={s.date}
-                objectiveId={objective.id}
-                successAction={
-                  isToday || isYesterday ? successAction : undefined
-                }
-              />
-            );
-          })}
-        </div>
-      </Section>
-    );
-  }
-);
+  return (
+    <Section title="Progress">
+      <div class="p-6 flex gap-4 flex-wrap">
+        {checkboxes.map((s) => {
+          const isToday = getIsToday(s.date);
+          const isYesterday = getIsYesterday(s.date);
+          const isInThePast =
+            !isToday && s.date.getTime() < new Date().getTime();
+          return (
+            <SuccessCheckbox
+              key={s.id}
+              isPassed={s.isPassed}
+              isFailed={isInThePast && !s.isPassed}
+              date={s.date}
+              objectiveId={objective.id}
+              successAction={isToday || isYesterday ? successAction : undefined}
+            />
+          );
+        })}
+      </div>
+    </Section>
+  );
+});
