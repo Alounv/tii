@@ -10,7 +10,7 @@ export const Welcome = component$(() => {
 
   return (
     <div class="flex flex-col items-center gap-3">
-      <div>{`Welcome ${user.name}`}</div>
+      <div>{`Welcome ${user?.name}`}</div>
       <div>What is your main objective now?</div>
       <Form action={createAction}>
         <button class="inline-flex justify-center rounded-lg text-sm font-semibold py-2.5 px-4 bg-slate-900 text-white hover:bg-slate-700">
