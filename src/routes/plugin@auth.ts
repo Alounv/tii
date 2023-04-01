@@ -1,4 +1,4 @@
-import { serverAuth$ } from "~/server/auth";
+import { serverAuth$ } from "@builder.io/qwik-auth";
 import GitHub from "@auth/core/providers/github";
 import type { Provider } from "@auth/core/providers";
 import { createUser, getUserByEmail } from "~/data/user";
