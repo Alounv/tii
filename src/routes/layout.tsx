@@ -5,12 +5,7 @@ import { Nav } from "~/components/nav";
 import { getUserFromCookie } from "~/data/user";
 
 export const useGetCurrentUser = routeLoader$(async ({ cookie }) => {
-  try {
-    return getUserFromCookie(cookie);
-  } catch (e) {
-    console.error(e);
-    return null;
-  }
+  return getUserFromCookie(cookie);
 });
 
 export const useServerTimeLoader = routeLoader$(() => {

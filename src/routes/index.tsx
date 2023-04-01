@@ -54,61 +54,43 @@ export const head: DocumentHead = {
 };
 
 export const useGetUserObjective = routeLoader$(async ({ cookie }) => {
-  try {
-    const user = await getUserFromCookie(cookie);
-    if (user) {
-      return getObjectiveFromUser({ userId: user.id });
-    }
-  } catch (e) {
-    console.error(e);
+  const user = await getUserFromCookie(cookie);
+  if (user) {
+    return getObjectiveFromUser({ userId: user.id });
   }
 });
 
 export const useGetUserEncouragement = routeLoader$(async ({ cookie }) => {
-  try {
-    const user = await getUserFromCookie(cookie);
-    if (user) {
-      const objective = await getObjectiveFromUser({ userId: user.id });
-      if (objective) {
-        const isEncouragementGenerated = cookie.get("encouragement");
-        if (isEncouragementGenerated) return "";
+  const user = await getUserFromCookie(cookie);
+  if (user) {
+    const objective = await getObjectiveFromUser({ userId: user.id });
+    if (objective) {
+      const isEncouragementGenerated = cookie.get("encouragement");
+      if (isEncouragementGenerated) return "";
 
-        console.log("Generating encouragement");
-        const encouragement = await getEncouragement({
-          objective,
-          user,
-        });
-        return encouragement;
-      }
+      console.log("Generating encouragement");
+      const encouragement = await getEncouragement({
+        objective,
+        user,
+      });
+      return encouragement;
     }
-  } catch (e) {
-    console.error(e);
   }
 });
 
 export const useCreateObjective = routeAction$(async (_, { cookie }) => {
-  try {
-    const user = await getUserFromCookie(cookie);
-    if (!user) {
-      return { success: false, error: "You must login to create an objective" };
-    }
-    const objective = await createObjective({ userId: user.id });
-    return { success: true, objective };
-  } catch (e) {
-    console.error(e);
-    return { success: false, error: "error" };
+  const user = await getUserFromCookie(cookie);
+  if (!user) {
+    return { success: false, error: "You must login to create an objective" };
   }
+  const objective = await createObjective({ userId: user.id });
+  return { success: true, objective };
 });
 
 export const useDeleteObjective = routeAction$(
   async ({ objectiveId }) => {
-    try {
-      await deleteObjective(objectiveId);
-      return { success: true };
-    } catch (e) {
-      console.error(e);
-      return { success: false, error: "error" };
-    }
+    await deleteObjective(objectiveId);
+    return { success: true };
   },
   zod$({
     objectiveId: z.string(),
@@ -128,20 +110,15 @@ const objectiveEditSchema = z.object({
 export type ObjectiveEditSchema = z.infer<typeof objectiveEditSchema>;
 
 export const useEditObjective = routeAction$(async (input) => {
-  try {
-    const { duration: stringDuration, daily_saving, ...rest } = input;
+  const { duration: stringDuration, daily_saving, ...rest } = input;
 
-    const duration = stringDuration ? parseInt(stringDuration) : undefined;
-    const cost = daily_saving
-      ? parseInt(daily_saving) * (duration || 0)
-      : undefined;
+  const duration = stringDuration ? parseInt(stringDuration) : undefined;
+  const cost = daily_saving
+    ? parseInt(daily_saving) * (duration || 0)
+    : undefined;
 
-    await updateObjective({ duration, cost, ...rest });
-    return { success: true };
-  } catch (e) {
-    console.error(e);
-    return { success: false, error: "error" };
-  }
+  await updateObjective({ duration, cost, ...rest });
+  return { success: true };
 }, zod$(objectiveEditSchema));
 
 const setSuccessSchema = z.object({
@@ -154,13 +131,8 @@ export type SetSuccessSchema = z.infer<typeof setSuccessSchema>;
 
 export const useToggleTodaySuccess = routeAction$(
   async ({ objectiveId, isDone, date }) => {
-    try {
-      await setSuccess({ objectiveId, isDone, date: new Date(date) });
-      return { success: true };
-    } catch (e) {
-      console.error(e);
-      return { success: false, error: "error" };
-    }
+    await setSuccess({ objectiveId, isDone, date: new Date(date) });
+    return { success: true };
   },
   zod$(setSuccessSchema),
 );
