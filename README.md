@@ -1,7 +1,7 @@
 # This is it
 
-This app helps me stay focused on my main objective.
-You can test it here: [https://this-is-it.fly.dev/](https://this-is-it.fly.dev/).
+This app helps me stay focused on my main objective. You can test it here:
+[https://this-is-it.fly.dev/](https://this-is-it.fly.dev/).
 
 ## What
 
@@ -17,13 +17,14 @@ You can test it here: [https://this-is-it.fly.dev/](https://this-is-it.fly.dev/)
 This is a personal project for me to learn:
 
 - Qwik
-- Prisma
+- Drizzle
 - Tailwind
 - Open AI
 
 ## Fastify Server
 
-This app has a minimal [Fastify server](https://fastify.io/) implementation. After running a full build, you can preview the build using the command:
+This app has a minimal [Fastify server](https://fastify.io/) implementation.
+After running a full build, you can preview the build using the command:
 
 ```
 pnpm deploy

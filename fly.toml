@@ -6,9 +6,6 @@ kill_timeout = 5
 primary_region = "cdg"
 processes = []
 
-[deploy]
-  release_command = "npx prisma migrate deploy"
-
 [env]
   PORT = "8080"
 

@@ -1,10 +1,11 @@
 import { component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
 import { Form } from "@builder.io/qwik-city";
-import type { Objective, Success } from "@prisma/client";
 import { Editable } from "./editable";
 import { Section } from "./section";
 import { eraseCookie, setCookie } from "~/utilities/cookie";
 import { useEditObjective, useGetUserEncouragement } from "~/routes";
+import type { Objective } from "~/data/objective";
+import type { Success } from "~/data/success";
 
 interface IObjectiveSection {
   objective: Objective & { success: Success[] };
@@ -31,6 +32,8 @@ export const ObjectiveSection = component$(
         }
       } catch (e) {
         console.error(e);
+        encouragement.value =
+          "Sorry, there was an error. Please try again later.";
       }
     });
 

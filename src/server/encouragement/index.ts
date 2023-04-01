@@ -1,8 +1,12 @@
-import { Objective, Success, User } from "@prisma/client";
+import { Objective } from "~/data/objective";
 import { getTextCompletion } from "../openai";
+import { Success } from "~/data/success";
+import { User } from "~/data/user";
 
-
-export const getEncouragement = async ({objective, user}:{objective: Objective & { success: Success[] }, user: User}): Promise<string> => {
+export const getEncouragement = async ({objective, user}:{
+  objective: Pick<Objective, 'coach' | 'duration' | 'description' | 'motivation'> & { success: Success[] },
+  user: Pick<User, 'name'>
+}): Promise<string> => {
   const successCount = objective.success.length;
 
   const prompt = `
@@ -13,12 +17,5 @@ export const getEncouragement = async ({objective, user}:{objective: Objective &
   The style of ${objective.coach} must be recognizable and it must be funny.
   `
 
-  const { encouragement, error } = await getTextCompletion(prompt);
-  if (error) {
-    console.error(error);
-    return 'Sorry, there was an error. Please try again later.';
-  }
-
-
-  return encouragement  || '';
+  return await getTextCompletion(prompt);
 };

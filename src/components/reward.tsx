@@ -1,9 +1,10 @@
 import { component$ } from "@builder.io/qwik";
 import { Form } from "@builder.io/qwik-city";
-import type { Objective, Success } from "@prisma/client";
 import { Editable } from "./editable";
 import { Section } from "./section";
 import { useEditObjective } from "~/routes";
+import type { Objective } from "~/data/objective";
+import type { Success } from "~/data/success";
 
 interface IRewardSection {
   objective: Objective & { success: Success[] };

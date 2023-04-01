@@ -6,7 +6,7 @@
   },
   "private": true,
   "scripts": {
-    "build": "npm run prisma:migrate && npm run qwik build",
+    "build": "qwik build",
     "build.client": "vite build",
     "build.preview": "vite build --ssr src/entry.preview.tsx",
     "build.server": "vite build -c adapters/fastify/vite.config.ts",
@@ -19,8 +19,6 @@
     "fmt.check": "prettier --check .",
     "lint": "eslint \"src/**/*.ts*\"",
     "preview": "qwik build preview && vite preview --open",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate deploy",
     "setup": "prisma:generate && prisma:migrate",
     "start": "vite --open --mode ssr",
     "qwik": "qwik"
@@ -46,19 +44,16 @@
     "eslint-plugin-qwik": "0.24.0",
     "postcss": "8.4.21",
     "prettier": "2.8.6",
-    "prisma": "4.11.0",
     "typescript": "5.0.2",
     "undici": "5.21.0",
     "vite": "4.2.1",
     "vite-tsconfig-paths": "3.5.0"
   },
   "dependencies": {
-    "@prisma/client": "4.11.0",
     "drizzle-orm": "^0.23.4",
     "fastify": "4.15.0",
     "fastify-plugin": "4.5.0",
     "openai": "3.2.1",
-    "uuid": "^9.0.0",
     "zod": "3.21.4",
     "pg": "8.7.1"
   }

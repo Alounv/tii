@@ -1,6 +1,6 @@
 import { component$, useSignal, $, useOnDocument } from "@builder.io/qwik";
 import { Form } from "@builder.io/qwik-city";
-import type { User } from "@prisma/client";
+import type { User } from "~/data/user";
 import { useAuthSignout } from "~/routes/plugin@auth";
 
 export const Profile = component$(({ user }: { user: User }) => {
@@ -16,7 +16,7 @@ export const Profile = component$(({ user }: { user: User }) => {
           useMenu.value = false;
         }
       }
-    })
+    }),
   );
 
   return (

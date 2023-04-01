@@ -13,7 +13,7 @@ import { Welcome } from "~/components/welcome";
 import {
   createObjective,
   deleteObjective,
-  getObjectiveFromUser,
+  getObjectiveWithSuccessFromUser,
   updateObjective,
 } from "~/data/objective";
 import { setSuccess } from "~/data/success";
@@ -56,25 +56,27 @@ export const head: DocumentHead = {
 export const useGetUserObjective = routeLoader$(async ({ cookie }) => {
   const user = await getUserFromCookie(cookie);
   if (user) {
-    return getObjectiveFromUser({ userId: user.id });
+    return getObjectiveWithSuccessFromUser({ userId: user.id });
   }
 });
 
 export const useGetUserEncouragement = routeLoader$(async ({ cookie }) => {
-  const user = await getUserFromCookie(cookie);
-  if (user) {
-    const objective = await getObjectiveFromUser({ userId: user.id });
-    if (objective) {
-      const isEncouragementGenerated = cookie.get("encouragement");
-      if (isEncouragementGenerated) return "";
-
-      console.log("Generating encouragement");
-      const encouragement = await getEncouragement({
-        objective,
-        user,
+  try {
+    const user = await getUserFromCookie(cookie);
+    if (user) {
+      const objective = await getObjectiveWithSuccessFromUser({
+        userId: user.id,
       });
-      return encouragement;
+      if (objective) {
+        const isEncouragementGenerated = cookie.get("encouragement");
+        if (isEncouragementGenerated) return "";
+
+        return await getEncouragement({ objective, user });
+      }
     }
+  } catch (e: any) {
+    console.error(e);
+    return `Sorry, there was an error. Please try again later. (${e.message})`;
   }
 });
 

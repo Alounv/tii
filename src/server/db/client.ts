@@ -1,16 +1,10 @@
-import { PrismaClient } from '@prisma/client'
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+import { z } from "zod";
 
-declare global {
-  // eslint-disable-next-line no-var
-  var prisma: PrismaClient | undefined
-}
+const pool = new Pool({
+  connectionString: z.string().nonempty().parse(import.meta.env.VITE_DATABASE_URL),
+  ssl: true,
+});
 
-export const prisma =
-  global.prisma ||
-  new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
-  })
-
-if (process.env.NODE_ENV !== 'production') {
-  global.prisma = prisma
-}
+export const db = drizzle(pool);

@@ -1,9 +1,10 @@
 import { component$ } from "@builder.io/qwik";
-import type { Objective, Success } from "@prisma/client";
 import { Section } from "./section";
 import { SuccessCheckbox } from "./success";
 import { getIsTheSameDay, getIsToday, getIsYesterday } from "~/utilities/date";
 import { useToggleTodaySuccess } from "~/routes";
+import type { Success } from "~/data/success";
+import type { Objective } from "~/data/objective";
 
 const getNumberOfBoxes = (duration: number, success: Success[]) => {
   const now = new Date();

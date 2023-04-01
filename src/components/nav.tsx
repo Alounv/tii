@@ -1,7 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import { TiiLogo } from "./tii";
 import { Profile } from "./profile";
-import type { User } from "@prisma/client";
+import type { User } from "~/data/user";
 
 const Start = component$(() => {
   return (

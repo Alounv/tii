@@ -10,16 +10,12 @@ const OPTIONS = {
   model: 'text-davinci-003'
 }
 
-export const getTextCompletion = async (prompt: string): Promise<{encouragement?: string, error?: any }> => {
-  try {
-    const configuration = new Configuration({ apiKey: process.env.VITE_OPENAI_API_KEY })
+export const getTextCompletion = async (prompt: string): Promise<string> => {
+    const configuration = new Configuration({ apiKey: import.meta.env.VITE_OPENAI_API_KEY })
     const openai = new OpenAIApi(configuration)
     const completion = await openai.createCompletion(
       { ...OPTIONS, prompt },
       { timeout: 60_000 }
     )
-    return { encouragement: completion.data.choices[0].text || '' }
-  } catch (error) {
-    return { error }
-  }
+    return completion.data.choices[0].text || ''
 }

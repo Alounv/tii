@@ -1,6 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import type { ActionStore } from "@builder.io/qwik-city";
 import type { SetSuccessSchema } from "~/routes";
+import { eraseCookie } from "~/utilities/cookie";
 
 interface ISuccess {
   isPassed: boolean;
@@ -15,6 +16,7 @@ export const SuccessCheckbox = component$(
     const day = date.getDate();
     const month = date.getMonth();
     const isDisabled = !successAction;
+
     return (
       <div class="flex-shrink-0 flex flex-col items-center gap-2">
         <label class="text-sm text-gray-400 cursor-pointer" for="today">
@@ -35,9 +37,10 @@ export const SuccessCheckbox = component$(
               date: date.toString(),
               isDone: event.target.checked,
             });
+            eraseCookie("encouragement");
           }}
         />
       </div>
     );
-  }
+  },
 );

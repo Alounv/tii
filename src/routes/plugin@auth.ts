@@ -5,13 +5,13 @@ import { createUser, getUserByEmail } from "~/data/user";
 import { z } from "zod";
 
 export const { onRequest, useAuthSession, useAuthSignin, useAuthSignout } =
-  serverAuth$(({ env }: { env: any }) => ({
-    secret: z.string().parse(env.get("VITE_NEXTAUTH_SECRET")),
+  serverAuth$(() => ({
+    secret: z.string().parse(import.meta.env.VITE_NEXTAUTH_SECRET),
     trustHost: true,
     providers: [
       GitHub({
-        clientId: z.string().parse(env.get("VITE_GITHUB_ID")),
-        clientSecret: z.string().parse(env.get("VITE_GITHUB_SECRET")),
+        clientId: z.string().parse(import.meta.env.VITE_GITHUB_ID),
+        clientSecret: z.string().parse(import.meta.env.VITE_GITHUB_SECRET),
       }),
     ] as Provider[],
     callbacks: {
