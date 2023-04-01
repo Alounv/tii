@@ -1,11 +1,11 @@
-import { serverAuth$ } from "@builder.io/qwik-auth";
+import { serverAuth$ } from "~/server/auth";
 import GitHub from "@auth/core/providers/github";
 import type { Provider } from "@auth/core/providers";
 import { createUser, getUserByEmail } from "~/data/user";
 import { z } from "zod";
 
 export const { onRequest, useAuthSession, useAuthSignin, useAuthSignout } =
-  serverAuth$(({ env }) => ({
+  serverAuth$(({ env }: { env: any }) => ({
     secret: z.string().parse(env.get("VITE_NEXTAUTH_SECRET")),
     trustHost: true,
     providers: [

@@ -28,7 +28,6 @@
   "devDependencies": {
     "@auth/core": "^0.4.0",
     "@builder.io/qwik": "0.24.0",
-    "@builder.io/qwik-auth": "0.0.5",
     "@builder.io/qwik-city": "0.7.0",
     "@fastify/compress": "6.2.0",
     "@fastify/static": "6.9.0",
@@ -51,9 +50,7 @@
     "vite-tsconfig-paths": "3.5.0"
   },
   "dependencies": {
-    "@auth/core": "0.5.1",
     "zod": "3.21.4",
-    "set-cookie-parser": "2.6.0",
     "@prisma/client": "4.11.0",
     "openai": "3.2.1",
     "fastify": "4.15.0",
