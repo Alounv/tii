@@ -1,4 +1,9 @@
-import { component$ } from "@builder.io/qwik";
+import {
+  component$,
+  createContextId,
+  useContextProvider,
+  useSignal,
+} from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 import { z } from "@builder.io/qwik-city";
 import { zod$ } from "@builder.io/qwik-city";
@@ -19,11 +24,12 @@ import {
 import { setSuccess } from "~/data/success";
 import { getUserFromCookie } from "~/data/user";
 import { useAuthSession } from "~/routes/plugin@auth";
-import { getEncouragement } from "~/server/encouragement";
 
 export default component$(() => {
   const userSignal = useAuthSession();
   const { value: objective } = useGetUserObjective() || {};
+  const refreshEncouragement = useSignal<boolean>(false);
+  useContextProvider(RefreshEncouragementContext, refreshEncouragement);
 
   if (!userSignal.value?.user) {
     return <Login />;
@@ -53,30 +59,14 @@ export const head: DocumentHead = {
   ],
 };
 
+export const RefreshEncouragementContext = createContextId<{ value: boolean }>(
+  "refresh-encouragement",
+);
+
 export const useGetUserObjective = routeLoader$(async ({ cookie }) => {
   const user = await getUserFromCookie(cookie);
   if (user) {
     return getObjectiveWithSuccessFromUser({ userId: user.id });
-  }
-});
-
-export const useGetUserEncouragement = routeLoader$(async ({ cookie }) => {
-  try {
-    const user = await getUserFromCookie(cookie);
-    if (user) {
-      const objective = await getObjectiveWithSuccessFromUser({
-        userId: user.id,
-      });
-      if (objective) {
-        const isEncouragementGenerated = cookie.get("encouragement");
-        if (isEncouragementGenerated) return "";
-
-        return await getEncouragement({ objective, user });
-      }
-    }
-  } catch (e: any) {
-    console.error(e);
-    return `Sorry, there was an error. Please try again later. (${e.message})`;
   }
 });
 

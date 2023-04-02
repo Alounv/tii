@@ -1,7 +1,7 @@
-import { component$ } from "@builder.io/qwik";
+import { component$, useContext } from "@builder.io/qwik";
 import type { ActionStore } from "@builder.io/qwik-city";
 import type { SetSuccessSchema } from "~/routes";
-import { eraseCookie } from "~/utilities/cookie";
+import { RefreshEncouragementContext } from "~/routes";
 
 interface ISuccess {
   isPassed: boolean;
@@ -16,6 +16,7 @@ export const SuccessCheckbox = component$(
     const day = date.getDate();
     const month = date.getMonth();
     const isDisabled = !successAction;
+    const refreshEncouragement = useContext(RefreshEncouragementContext);
 
     return (
       <div class="flex-shrink-0 flex flex-col items-center gap-2">
@@ -37,7 +38,7 @@ export const SuccessCheckbox = component$(
               date: date.toString(),
               isDone: event.target.checked,
             });
-            eraseCookie("encouragement");
+            refreshEncouragement.value = !refreshEncouragement.value;
           }}
         />
       </div>

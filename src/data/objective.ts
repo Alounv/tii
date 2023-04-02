@@ -9,7 +9,7 @@ const defaultObjective: Omit<Objective, "userId" | "id"> = {
   description: "Go to bed at 11pm",
   duration: 21,
   cost: 210,
-  coach: "Mark Watney (The Martian)",
+  coach: "Tyrion Lannister",
   motivation: "A week-end with friends in the mountains",
   motivation_url:
     "https://www.mthigh.com/site/mountain/mountain-info/camping/northlodge/IMG_8056/stack-promo--xl",

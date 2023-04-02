@@ -1,11 +1,38 @@
-import { component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
+import {
+  Resource,
+  component$,
+  useContext,
+  useResource$,
+} from "@builder.io/qwik";
 import { Form } from "@builder.io/qwik-city";
 import { Editable } from "./editable";
 import { Section } from "./section";
-import { eraseCookie, setCookie } from "~/utilities/cookie";
-import { useEditObjective, useGetUserEncouragement } from "~/routes";
+import { RefreshEncouragementContext, useEditObjective } from "~/routes";
 import type { Objective } from "~/data/objective";
 import type { Success } from "~/data/success";
+import { useGetCurrentUser } from "~/routes/layout";
+import { getTextCompletion } from "~/utilities/encouragement";
+
+export const getPrompt = ({
+  objective,
+  name,
+}: {
+  objective: Pick<
+    Objective,
+    "coach" | "duration" | "description" | "motivation"
+  > & { success: Success[] };
+  name: string;
+}): string => {
+  const successCount = objective.success.length;
+
+  return `
+  Imagine ${objective.coach} is encouraging ${name} 
+  to pursue his goal of ${objective.description} for ${objective.duration} days 
+  in order to afford ${objective.motivation}.
+  It has lasted ${successCount} days already.
+  The style of ${objective.coach} must be recognizable and it must be funny.
+  `;
+};
 
 interface IObjectiveSection {
   objective: Objective & { success: Success[] };
@@ -13,28 +40,19 @@ interface IObjectiveSection {
 
 export const ObjectiveSection = component$(
   ({ objective }: IObjectiveSection) => {
-    const { value: encouragementValue } = useGetUserEncouragement() || {};
+    const { value: user } = useGetCurrentUser();
     const editAction = useEditObjective();
-    const encouragement = useSignal<string>("");
+    const refreshEncouragement = useContext(RefreshEncouragementContext);
 
-    useVisibleTask$(({ track }) => {
-      try {
-        track(() => encouragementValue);
-        if (encouragementValue) {
-          sessionStorage.setItem("encouragement", encouragementValue);
-          setCookie("encouragement", "true", 1);
-          encouragement.value = encouragementValue;
-        } else {
-          encouragement.value = sessionStorage.getItem("encouragement") || "";
-          if (!encouragement.value) {
-            eraseCookie("encouragement");
-          }
-        }
-      } catch (e) {
-        console.error(e);
-        encouragement.value =
-          "Sorry, there was an error. Please try again later.";
+    const encouragementResource = useResource$<string>(async ({ track }) => {
+      track(() => refreshEncouragement.value);
+      if (user) {
+        const prompt = getPrompt({ objective, name: user.name || "User" });
+
+        console.log("BEFORE");
+        return getTextCompletion(prompt);
       }
+      return "User undefined";
     });
 
     const { description, coach, duration, cost } = objective;
@@ -82,23 +100,25 @@ export const ObjectiveSection = component$(
               <button
                 class="rounded-lg text-gray-400 text-sm py-1 px-2 hover:bg-grey-200 border"
                 onClick$={() => {
-                  eraseCookie("encouragement");
-                  location.reload();
+                  refreshEncouragement.value = !refreshEncouragement.value;
                 }}
               >
                 new encouragement
               </button>
             </div>
             <div class="rounded-xl p-8 bg-gray-50 border italic mt-2 text-lg text-gray-900 text-center">
-              <div
-                class={
-                  encouragement
-                    ? "text-sky-700 text-2xl font-semibold opacity-80"
-                    : "text-gray-300"
-                }
-              >
-                {encouragement || "Encouragement is loading..."}
-              </div>
+              <Resource
+                value={encouragementResource}
+                onPending={() => <div class="text-gray-300">Loading...</div>}
+                onRejected={(e) => (
+                  <div class="text-gray-300">{`Error: ${e}`}</div>
+                )}
+                onResolved={(e) => (
+                  <div class="text-sky-700 text-2xl font-semibold opacity-80">
+                    {e}
+                  </div>
+                )}
+              />
             </div>
           </div>
         </Form>
