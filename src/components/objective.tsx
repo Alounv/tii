@@ -41,16 +41,21 @@ export const ObjectiveSection = component$(
   ({ objective }: IObjectiveSection) => {
     const { value: user } = useGetCurrentUser();
     const editAction = useEditObjective();
-    const refreshEncouragement = useContext(RefreshEncouragementContext);
+    const refresh = useContext(RefreshEncouragementContext);
 
     const encouragementResource = useResource$<string>(async ({ track }) => {
-      track(() => refreshEncouragement.value);
-      if (user) {
-        const prompt = getPrompt({ objective, name: user.name || "User" });
+      track(() => refresh.value);
+      try {
+        if (user) {
+          const prompt = getPrompt({ objective, name: user.name || "User" });
 
-        return getTextCompletion(prompt);
+          return await getTextCompletion(prompt);
+        }
+        return "User undefined";
+      } catch (error) {
+        console.error(error);
+        throw error;
       }
-      return "User undefined";
     });
 
     const { description, coach, duration, cost } = objective;
@@ -98,7 +103,7 @@ export const ObjectiveSection = component$(
               <button
                 class="rounded-lg text-gray-400 text-sm py-1 px-2 hover:bg-grey-200 border"
                 onClick$={() => {
-                  refreshEncouragement.value = !refreshEncouragement.value;
+                  refresh.value = !refresh.value;
                 }}
               >
                 new encouragement
@@ -108,12 +113,22 @@ export const ObjectiveSection = component$(
               <Resource
                 value={encouragementResource}
                 onPending={() => <div class="text-gray-300">Loading...</div>}
-                onRejected={(e) => (
-                  <div class="text-gray-300">{`Error: ${e}`}</div>
-                )}
-                onResolved={(e) => (
+                onRejected={(error) => {
+                  console.error(error);
+                  return (
+                    <button
+                      class="text-grey-700 text-2xl font-semibold opacity-80"
+                      onClick$={() => {
+                        refresh.value = !refresh.value;
+                      }}
+                    >
+                      Ask for encouragement
+                    </button>
+                  );
+                }}
+                onResolved={(encouragement) => (
                   <div class="text-sky-700 text-2xl font-semibold opacity-80">
-                    {e}
+                    {encouragement}
                   </div>
                 )}
               />
