@@ -9,10 +9,9 @@ export const useGetCurrentUser = routeLoader$(async ({ cookie }) => {
 });
 
 export default component$(() => {
-  const { value } = useGetCurrentUser();
   return (
     <div class="min-h-full bg-white sm:bg-transparent">
-      <Nav user={value} />
+      <Nav />
       <main>
         <div class="mx-auto max-w-4xl sm:p-8">
           <div class="py-6 px-6 sm:px-8 lg:px-12 xl:px-16 overflow-hidden bg-white sm:shadow rounded-lg min-h-full">

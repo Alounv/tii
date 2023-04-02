@@ -23,15 +23,15 @@ import {
 } from "~/data/objective";
 import { setSuccess } from "~/data/success";
 import { getUserFromCookie } from "~/data/user";
-import { useAuthSession } from "~/routes/plugin@auth";
+import { useGetCurrentUser } from "./layout";
 
 export default component$(() => {
-  const userSignal = useAuthSession();
+  const { value: user } = useGetCurrentUser();
   const { value: objective } = useGetUserObjective() || {};
   const refreshEncouragement = useSignal<boolean>(false);
   useContextProvider(RefreshEncouragementContext, refreshEncouragement);
 
-  if (!userSignal.value?.user) {
+  if (!user) {
     return <Login />;
   }
 

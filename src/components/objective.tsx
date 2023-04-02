@@ -48,7 +48,6 @@ export const ObjectiveSection = component$(
       if (user) {
         const prompt = getPrompt({ objective, name: user.name || "User" });
 
-        console.log("BEFORE");
         return getTextCompletion(prompt);
       }
       return "User undefined";

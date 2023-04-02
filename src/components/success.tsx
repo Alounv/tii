@@ -18,7 +18,7 @@ export const SuccessCheckbox = component$(
     const action = isToday || isYesterday ? successAction : undefined;
 
     const day = date.getDate();
-    const month = date.getMonth();
+    const month = date.getMonth() + 1;
     const refreshEncouragement = useContext(RefreshEncouragementContext);
 
     return (

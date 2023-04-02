@@ -1,11 +1,11 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "e0ba06e2-16c1-4df4-b29d-4a29012f7415",
+  "id": "4968a9ba-3fae-40cc-a46c-8fa85191ce93",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "Objective": {
-      "name": "Objective",
+    "objectives": {
+      "name": "objectives",
       "schema": "",
       "columns": {
         "id": {
@@ -15,9 +15,9 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "userId": {
-          "name": "userId",
-          "type": "text",
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -60,12 +60,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "Objective_userId_User_id_fk": {
-          "name": "Objective_userId_User_id_fk",
-          "tableFrom": "Objective",
-          "tableTo": "User",
+        "objectives_user_id_users_id_fk": {
+          "name": "objectives_user_id_users_id_fk",
+          "tableFrom": "objectives",
+          "tableTo": "users",
           "columnsFrom": [
-            "userId"
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -76,8 +76,8 @@
       },
       "compositePrimaryKeys": {}
     },
-    "Success": {
-      "name": "Success",
+    "success": {
+      "name": "success",
       "schema": "",
       "columns": {
         "id": {
@@ -94,21 +94,21 @@
           "notNull": true,
           "default": "now()"
         },
-        "objectiveId": {
-          "name": "objectiveId",
-          "type": "text",
+        "objective_id": {
+          "name": "objective_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "Success_objectiveId_Objective_id_fk": {
-          "name": "Success_objectiveId_Objective_id_fk",
-          "tableFrom": "Success",
-          "tableTo": "Objective",
+        "success_objective_id_objectives_id_fk": {
+          "name": "success_objective_id_objectives_id_fk",
+          "tableFrom": "success",
+          "tableTo": "objectives",
           "columnsFrom": [
-            "objectiveId"
+            "objective_id"
           ],
           "columnsTo": [
             "id"
@@ -119,8 +119,8 @@
       },
       "compositePrimaryKeys": {}
     },
-    "User": {
-      "name": "User",
+    "users": {
+      "name": "users",
       "schema": "",
       "columns": {
         "id": {

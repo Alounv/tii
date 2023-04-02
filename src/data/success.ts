@@ -27,14 +27,10 @@ export const setSuccess = async ({
     return success[0];
   }
 
-  console.log("E", date, objectiveId);
-
   const inserted = await db
     .insert(successTable)
     .values({ date, objectiveId })
     .returning();
-
-  console.log("F", inserted);
 
   return inserted[0];
 };

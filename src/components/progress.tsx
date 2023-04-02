@@ -63,7 +63,7 @@ export const ProgressSection = component$(({ objective }: IProgressSection) => {
             !isToday && s.date.getTime() < new Date().getTime();
           return (
             <SuccessCheckbox
-              key={s.id}
+              key={s.date.toString()}
               isPassed={s.isPassed}
               isFailed={isInThePast && !s.isPassed}
               date={s.date}

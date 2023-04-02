@@ -1,9 +1,9 @@
 import { integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import type { InferModel } from "drizzle-orm";
 
-export const objectivesTable = pgTable("Objective", {
+export const objectivesTable = pgTable("objectives", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("userId")
+  userId: uuid("user_id")
     .references(() => usersTable.id)
     .notNull(),
   description: text("description").notNull(),
@@ -18,10 +18,10 @@ export type Objective = InferModel<typeof objectivesTable>;
 export type NewObjective = InferModel<typeof objectivesTable, "insert">;
 
 
-export const successTable = pgTable("Success", {
+export const successTable = pgTable("success", {
   id: uuid("id").primaryKey().defaultRandom(),
   date: timestamp("date").defaultNow().notNull(),
-  objectiveId: text("objectiveId")
+  objectiveId: uuid("objective_id")
     .references(() => objectivesTable.id)
     .notNull(),
 });
@@ -29,7 +29,7 @@ export const successTable = pgTable("Success", {
 export type Success = InferModel<typeof successTable>;
 export type NewSuccess = InferModel<typeof successTable, "insert">;
 
-export const usersTable = pgTable("User", {
+export const usersTable = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull(),
   name: text("name"),

@@ -1,6 +1,6 @@
-CREATE TABLE IF NOT EXISTS "Objective" (
+CREATE TABLE IF NOT EXISTS "objectives" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"userId" text NOT NULL,
+	"user_id" uuid NOT NULL,
 	"description" text NOT NULL,
 	"duration" integer NOT NULL,
 	"cost" integer NOT NULL,
@@ -9,13 +9,13 @@ CREATE TABLE IF NOT EXISTS "Objective" (
 	"motivation_url" text NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "Success" (
+CREATE TABLE IF NOT EXISTS "success" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"date" timestamp DEFAULT now() NOT NULL,
-	"objectiveId" text NOT NULL
+	"objective_id" uuid NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "User" (
+CREATE TABLE IF NOT EXISTS "users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"email" text NOT NULL,
 	"name" text,
@@ -23,13 +23,13 @@ CREATE TABLE IF NOT EXISTS "User" (
 );
 
 DO $$ BEGIN
- ALTER TABLE Objective ADD CONSTRAINT Objective_userId_User_id_fk FOREIGN KEY ("userId") REFERENCES User("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE objectives ADD CONSTRAINT objectives_user_id_users_id_fk FOREIGN KEY ("user_id") REFERENCES users("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 
 DO $$ BEGIN
- ALTER TABLE Success ADD CONSTRAINT Success_objectiveId_Objective_id_fk FOREIGN KEY ("objectiveId") REFERENCES Objective("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE success ADD CONSTRAINT success_objective_id_objectives_id_fk FOREIGN KEY ("objective_id") REFERENCES objectives("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

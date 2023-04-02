@@ -45,6 +45,8 @@ export const getObjectiveWithSuccessFromUser = async ({
     .where(eq(objectivesTable.userId, userId));
 
   const objective = objectives[0];
+  if (!objective) return null;
+
   const success = await db
     .select()
     .from(successTable)

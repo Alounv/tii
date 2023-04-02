@@ -1,7 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import { TiiLogo } from "./tii";
 import { Profile } from "./profile";
-import type { User } from "~/server/db/schema";
+import { useGetCurrentUser } from "~/routes/layout";
 
 const Start = component$(() => {
   return (
@@ -26,7 +26,8 @@ const Start = component$(() => {
   );
 });
 
-export const Nav = component$(({ user }: { user: User | null }) => {
+export const Nav = component$(() => {
+  const { value: user } = useGetCurrentUser();
   return (
     <nav class="bg-gray-800 sticky top-0 z-10">
       <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
