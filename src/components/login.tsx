@@ -10,7 +10,6 @@ export const Login = component$(() => {
     <div class="flex flex-col gap-8 items-center py-6">
       <div>You must login (with a github account) to create an objective</div>
       <Form action={loginAction}>
-        <input type="hidden" name="providerId" value="github" />
         <div class="login">
           <button
             type="submit"
@@ -23,3 +22,5 @@ export const Login = component$(() => {
     </div>
   );
 });
+
+// <input type="hidden" name="providerId" value="github" />

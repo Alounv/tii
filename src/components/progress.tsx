@@ -2,7 +2,8 @@ import { component$ } from "@builder.io/qwik";
 import { Section } from "./section";
 import { SuccessCheckbox } from "./success";
 import { getIsTheSameDay, getIsToday } from "~/utilities/date";
-import type { Objective, Success } from "~/server/db/schema";
+import { useGetUserObjective } from "~/routes";
+import type { Success } from "~/server/db/schema";
 
 const getNumberOfBoxes = (duration: number, success: Success[]) => {
   const now = new Date();
@@ -45,11 +46,10 @@ const getCheckboxes = ({
   });
 };
 
-interface IProgressSection {
-  objective: Objective & { success: Success[] };
-}
+export const ProgressSection = component$(() => {
+  const { value: objective } = useGetUserObjective() || {};
+  if (!objective) return null;
 
-export const ProgressSection = component$(({ objective }: IProgressSection) => {
   const { duration, success } = objective;
   const { pastDaysCount, boxesCount } = getNumberOfBoxes(duration, success);
   const checkboxes = getCheckboxes({ success, boxesCount, pastDaysCount });

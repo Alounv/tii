@@ -2,14 +2,12 @@ import { component$ } from "@builder.io/qwik";
 import { Form } from "@builder.io/qwik-city";
 import { Editable } from "./editable";
 import { Section } from "./section";
-import { useEditObjective } from "~/routes";
-import type { Objective, Success } from "~/server/db/schema";
+import { useEditObjective, useGetUserObjective } from "~/routes";
 
-interface IRewardSection {
-  objective: Objective & { success: Success[] };
-}
+export const RewardSection = component$(() => {
+  const { value: objective } = useGetUserObjective() || {};
+  if (!objective) return null;
 
-export const RewardSection = component$(({ objective }: IRewardSection) => {
   const editAction = useEditObjective();
   const { motivation, motivation_url, duration, cost, success } = objective;
 

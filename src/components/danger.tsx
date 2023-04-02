@@ -1,13 +1,12 @@
 import { component$ } from "@builder.io/qwik";
 import { Form } from "@builder.io/qwik-city";
 import { Section } from "./section";
-import { useDeleteObjective } from "~/routes";
+import { useDeleteObjective, useGetUserObjective } from "~/routes";
 
-interface IDangerSection {
-  objectiveId: string;
-}
+export const DangerSection = component$(() => {
+  const { value: objective } = useGetUserObjective() || {};
+  if (!objective) return null;
 
-export const DangerSection = component$(({ objectiveId }: IDangerSection) => {
   const deleteAction = useDeleteObjective();
   return (
     <Section title="Danger">
@@ -17,7 +16,7 @@ export const DangerSection = component$(({ objectiveId }: IDangerSection) => {
           action={deleteAction}
           class="flex mb-4 items-center justify-center gap-4"
         >
-          <input type="hidden" name="objectiveId" value={objectiveId} />
+          <input type="hidden" name="objectiveId" value={objective.id} />
 
           <button class="rounded-lg text-sm font-semibold py-2.5 px-4 bg-red-600 text-white hover:bg-red-700">
             Delete objective

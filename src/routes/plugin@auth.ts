@@ -3,6 +3,7 @@ import GitHub from "@auth/core/providers/github";
 import type { Provider } from "@auth/core/providers";
 import { createUser, getUserByEmail } from "~/data/user";
 import { z } from "zod";
+import Credentials from "@auth/core/providers/credentials";
 
 export const { onRequest, useAuthSession, useAuthSignin, useAuthSignout } =
   serverAuth$(() => ({
@@ -12,6 +13,19 @@ export const { onRequest, useAuthSession, useAuthSignin, useAuthSignout } =
       GitHub({
         clientId: z.string().parse(import.meta.env.VITE_GITHUB_ID),
         clientSecret: z.string().parse(import.meta.env.VITE_GITHUB_SECRET),
+      }),
+      Credentials({
+        name: "Credentials",
+        credentials: {
+          email: { label: "Email", type: "text", placeholder: "jsmith" },
+        },
+        authorize: async (credentials) => {
+          const user = await getUserByEmail(credentials.email as string);
+          if (user) {
+            return user;
+          }
+          return null;
+        },
       }),
     ] as Provider[],
     callbacks: {
