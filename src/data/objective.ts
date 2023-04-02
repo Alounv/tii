@@ -1,9 +1,8 @@
 import { eq } from "drizzle-orm/expressions";
-import { integer, pgTable, text, uuid } from "drizzle-orm/pg-core";
-import type { InferModel } from "drizzle-orm";
 import { db } from "~/server/db/client";
-import { usersTable } from "./user";
-import { successTable } from "./success";
+import type { NewObjective, Objective } from "~/server/db/schema";
+import { successTable } from "~/server/db/schema";
+import { objectivesTable } from "~/server/db/schema";
 
 const defaultObjective: Omit<Objective, "userId" | "id"> = {
   description: "Go to bed at 11pm",
@@ -15,28 +14,13 @@ const defaultObjective: Omit<Objective, "userId" | "id"> = {
     "https://www.mthigh.com/site/mountain/mountain-info/camping/northlodge/IMG_8056/stack-promo--xl",
 };
 
-export const objectivesTable = pgTable("Objective", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("userId")
-    .references(() => usersTable.id)
-    .notNull(),
-  description: text("description").notNull(),
-  duration: integer("duration").notNull(),
-  cost: integer("cost").notNull(),
-  coach: text("coach").notNull(),
-  motivation: text("motivation").notNull(),
-  motivation_url: text("motivation_url").notNull(),
-});
-
-export type Objective = InferModel<typeof objectivesTable>;
-export type NewObjective = InferModel<typeof objectivesTable, "insert">;
-
 export const createObjective = async ({
   userId,
 }: Pick<Objective, "userId">) => {
+  const newObjective: NewObjective = { ...defaultObjective, userId };
   const inserted = await db
     .insert(objectivesTable)
-    .values({ ...defaultObjective, userId })
+    .values(newObjective)
     .returning();
   return inserted[0];
 };

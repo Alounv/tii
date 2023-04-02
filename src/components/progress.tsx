@@ -1,10 +1,8 @@
 import { component$ } from "@builder.io/qwik";
 import { Section } from "./section";
 import { SuccessCheckbox } from "./success";
-import { getIsTheSameDay, getIsToday, getIsYesterday } from "~/utilities/date";
-import { useToggleTodaySuccess } from "~/routes";
-import type { Success } from "~/data/success";
-import type { Objective } from "~/data/objective";
+import { getIsTheSameDay, getIsToday } from "~/utilities/date";
+import type { Objective, Success } from "~/server/db/schema";
 
 const getNumberOfBoxes = (duration: number, success: Success[]) => {
   const now = new Date();
@@ -52,7 +50,6 @@ interface IProgressSection {
 }
 
 export const ProgressSection = component$(({ objective }: IProgressSection) => {
-  const successAction = useToggleTodaySuccess();
   const { duration, success } = objective;
   const { pastDaysCount, boxesCount } = getNumberOfBoxes(duration, success);
   const checkboxes = getCheckboxes({ success, boxesCount, pastDaysCount });
@@ -62,7 +59,6 @@ export const ProgressSection = component$(({ objective }: IProgressSection) => {
       <div class="p-6 flex gap-4 flex-wrap">
         {checkboxes.map((s) => {
           const isToday = getIsToday(s.date);
-          const isYesterday = getIsYesterday(s.date);
           const isInThePast =
             !isToday && s.date.getTime() < new Date().getTime();
           return (
@@ -72,7 +68,6 @@ export const ProgressSection = component$(({ objective }: IProgressSection) => {
               isFailed={isInThePast && !s.isPassed}
               date={s.date}
               objectiveId={objective.id}
-              successAction={isToday || isYesterday ? successAction : undefined}
             />
           );
         })}

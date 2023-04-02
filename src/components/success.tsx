@@ -1,21 +1,24 @@
 import { component$, useContext } from "@builder.io/qwik";
-import type { ActionStore } from "@builder.io/qwik-city";
-import type { SetSuccessSchema } from "~/routes";
+import { useToggleTodaySuccess } from "~/routes";
 import { RefreshEncouragementContext } from "~/routes";
+import { getIsToday, getIsYesterday } from "~/utilities/date";
 
 interface ISuccess {
   isPassed: boolean;
   isFailed: boolean;
   date: Date;
   objectiveId: string;
-  successAction?: ActionStore<unknown, SetSuccessSchema, boolean>;
 }
 
 export const SuccessCheckbox = component$(
-  ({ isPassed, isFailed, date, successAction, objectiveId }: ISuccess) => {
+  ({ isPassed, isFailed, date, objectiveId }: ISuccess) => {
+    const successAction = useToggleTodaySuccess();
+    const isToday = getIsToday(date);
+    const isYesterday = getIsYesterday(date);
+    const action = isToday || isYesterday ? successAction : undefined;
+
     const day = date.getDate();
     const month = date.getMonth();
-    const isDisabled = !successAction;
     const refreshEncouragement = useContext(RefreshEncouragementContext);
 
     return (
@@ -26,14 +29,14 @@ export const SuccessCheckbox = component$(
         <input
           id="today"
           type="checkbox"
-          disabled={isDisabled}
+          disabled={!action}
           checked={isPassed}
           class={`h-8 w-8 rounded disabled:border-gray-300 border-gray-500 text-sky-600 disabled:text-sky-500 focus:ring-sky-600 ${
             isFailed ? " bg-gray-300" : ""
-          } ${isDisabled ? "" : " shadow-lg drop-shadow-lg"}}`}
+          } ${!action ? "" : " shadow-lg drop-shadow-lg"}}`}
           onChange$={async (event) => {
             // eslint-disable-next-line qwik/valid-lexical-scope
-            await successAction?.submit({
+            await action?.submit({
               objectiveId,
               date: date.toString(),
               isDone: event.target.checked,

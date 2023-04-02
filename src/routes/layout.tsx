@@ -8,12 +8,6 @@ export const useGetCurrentUser = routeLoader$(async ({ cookie }) => {
   return getUserFromCookie(cookie);
 });
 
-export const useServerTimeLoader = routeLoader$(() => {
-  return {
-    date: new Date().toISOString(),
-  };
-});
-
 export default component$(() => {
   const { value } = useGetCurrentUser();
   return (

@@ -3,8 +3,7 @@ import { Form } from "@builder.io/qwik-city";
 import { Editable } from "./editable";
 import { Section } from "./section";
 import { useEditObjective } from "~/routes";
-import type { Objective } from "~/data/objective";
-import type { Success } from "~/data/success";
+import type { Objective, Success } from "~/server/db/schema";
 
 interface IRewardSection {
   objective: Objective & { success: Success[] };

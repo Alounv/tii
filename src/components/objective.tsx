@@ -8,10 +8,9 @@ import { Form } from "@builder.io/qwik-city";
 import { Editable } from "./editable";
 import { Section } from "./section";
 import { RefreshEncouragementContext, useEditObjective } from "~/routes";
-import type { Objective } from "~/data/objective";
-import type { Success } from "~/data/success";
 import { useGetCurrentUser } from "~/routes/layout";
 import { getTextCompletion } from "~/utilities/encouragement";
+import type { Objective, Success } from "~/server/db/schema";
 
 export const getPrompt = ({
   objective,

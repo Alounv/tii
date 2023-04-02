@@ -2,19 +2,9 @@ import { decode } from "@auth/core/jwt";
 import type { Cookie } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { eq } from "drizzle-orm/expressions";
-import { pgTable, text, uuid } from "drizzle-orm/pg-core";
-import type { InferModel } from "drizzle-orm";
 import { db } from "~/server/db/client";
-
-export const usersTable = pgTable("User", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  email: text("email").notNull(),
-  name: text("name"),
-  avatar_url: text("avatar_url"),
-});
-
-export type User = InferModel<typeof usersTable>;
-export type NewUser = InferModel<typeof usersTable, "insert">;
+import type { NewUser, User } from "~/server/db/schema";
+import { usersTable } from "~/server/db/schema";
 
 export async function getUserByEmail(email: User["email"]) {
   const found = await db
@@ -24,11 +14,7 @@ export async function getUserByEmail(email: User["email"]) {
   return found[0];
 }
 
-export async function createUser({
-  email,
-  name,
-  avatar_url,
-}: Pick<User, "email" | "name" | "avatar_url">) {
+export async function createUser({ email, name, avatar_url }: NewUser) {
   const inserted = await db
     .insert(usersTable)
     .values({ email, name, avatar_url })

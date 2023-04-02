@@ -1,7 +1,7 @@
 import { component$, useSignal, $, useOnDocument } from "@builder.io/qwik";
 import { Form } from "@builder.io/qwik-city";
-import type { User } from "~/data/user";
 import { useAuthSignout } from "~/routes/plugin@auth";
+import type { User } from "~/server/db/schema";
 
 export const Profile = component$(({ user }: { user: User }) => {
   const useMenu = useSignal(false);
