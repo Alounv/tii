@@ -71,18 +71,26 @@ export const useGetUserObjective = routeLoader$(async ({ cookie }) => {
 });
 
 export const useCreateObjective = routeAction$(async (_, { cookie }) => {
-  const user = await getUserFromCookie(cookie);
-  if (!user) {
-    return { success: false, error: "You must login to create an objective" };
+  try {
+    const user = await getUserFromCookie(cookie);
+    if (!user) {
+      return { success: false, error: "You must login to create an objective" };
+    }
+    const objective = await createObjective({ userId: user.id });
+    return { success: true, objective };
+  } catch (e: any) {
+    return { success: false, error: e.message };
   }
-  const objective = await createObjective({ userId: user.id });
-  return { success: true, objective };
 });
 
 export const useDeleteObjective = routeAction$(
   async ({ objectiveId }) => {
-    await deleteObjective(objectiveId);
-    return { success: true };
+    try {
+      await deleteObjective(objectiveId);
+      return { success: true };
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
   },
   zod$({
     objectiveId: z.string(),
@@ -102,15 +110,19 @@ const objectiveEditSchema = z.object({
 export type ObjectiveEditSchema = z.infer<typeof objectiveEditSchema>;
 
 export const useEditObjective = routeAction$(async (input) => {
-  const { duration: stringDuration, daily_saving, ...rest } = input;
+  try {
+    const { duration: stringDuration, daily_saving, ...rest } = input;
 
-  const duration = stringDuration ? parseInt(stringDuration) : undefined;
-  const cost = daily_saving
-    ? parseInt(daily_saving) * (duration || 0)
-    : undefined;
+    const duration = stringDuration ? parseInt(stringDuration) : undefined;
+    const cost = daily_saving
+      ? parseInt(daily_saving) * (duration || 0)
+      : undefined;
 
-  await updateObjective({ duration, cost, ...rest });
-  return { success: true };
+    await updateObjective({ duration, cost, ...rest });
+    return { success: true };
+  } catch (e: any) {
+    return { success: false, error: e.message };
+  }
 }, zod$(objectiveEditSchema));
 
 const setSuccessSchema = z.object({
@@ -119,12 +131,14 @@ const setSuccessSchema = z.object({
   date: z.string(),
 });
 
-export type SetSuccessSchema = z.infer<typeof setSuccessSchema>;
-
 export const useToggleTodaySuccess = routeAction$(
   async ({ objectiveId, isDone, date }) => {
-    await setSuccess({ objectiveId, isDone, date: new Date(date) });
-    return { success: true };
+    try {
+      await setSuccess({ objectiveId, isDone, date: new Date(date) });
+      return { success: true };
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
   },
   zod$(setSuccessSchema),
 );
