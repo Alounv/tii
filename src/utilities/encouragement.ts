@@ -1,4 +1,3 @@
-import { Configuration, OpenAIApi } from "openai";
 import type { Objective } from "~/server/db/schema";
 
 const OPTIONS = {
@@ -11,44 +10,48 @@ const OPTIONS = {
   model: "text-davinci-003",
 };
 
-const configuration = new Configuration({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-});
+const headers = {
+  "Content-Type": "application/json",
+  Authorization: "Bearer " + String(import.meta.env.VITE_OPENAI_API_KEY),
+};
 
-const openai = new OpenAIApi(configuration);
+const decoder = new TextDecoder("utf-8");
 
 const getTextCompletion = async (
   prompt: string,
   onData: (data: string) => void,
 ): Promise<void> => {
-  const response = await openai.createCompletion(
-    { ...OPTIONS, prompt, stream: true },
-    { timeout: 60_000, responseType: "stream" },
-  );
-
-  // @ts-ignore
-  response.data.on("data", (data) => {
-    const lines = data
-      .toString()
-      .split("\n")
-      .filter((line: string) => line.trim() !== "");
-
-    for (const l of lines) {
-      const message = l.replace(/^data: /, "");
-      if (message === "[DONE]") {
-        onData("[DONE]");
-        return;
-      }
-
-      try {
-        const parsedData = JSON.parse(message);
-        const content = parsedData?.choices?.[0]?.text;
-        if (content) onData(content);
-      } catch (e: any) {
-        console.error(`Could not parse data string |${message}|`, e.message);
-      }
-    }
+  const response = await fetch("https://api.openai.com/v1/completions", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ ...OPTIONS, prompt, stream: true }),
   });
+
+  const reader = response.body?.getReader();
+
+  if (!reader) {
+    console.error("Could not get reader from response");
+    return;
+  }
+
+  for (let i = 0; i < 1000; i++) {
+    const buffer = await reader.read();
+    const data = decoder.decode(buffer.value);
+    const message = data.replace(/^data: /, "");
+
+    if (message.includes("[DONE]")) {
+      return;
+    }
+
+    try {
+      const parsedData = JSON.parse(message);
+      const content = parsedData?.choices?.[0]?.text;
+      if (content) onData(content);
+    } catch (e: any) {
+      console.error(`Could not parse data string |${message}|`, e.message);
+      return;
+    }
+  }
 };
 
 interface IGetPrompt {
