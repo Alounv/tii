@@ -1,4 +1,5 @@
 import { Configuration, OpenAIApi } from "openai";
+import type { Objective, Success } from "~/server/db/schema";
 
 const OPTIONS = {
   max_tokens: 2048,
@@ -16,7 +17,7 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
-export const getTextCompletion = async (prompt: string): Promise<string> => {
+const getTextCompletion = async (prompt: string): Promise<string> => {
   try {
     const completion = await openai.createCompletion(
       { ...OPTIONS, prompt },
@@ -27,4 +28,30 @@ export const getTextCompletion = async (prompt: string): Promise<string> => {
     console.error(error);
     throw error;
   }
+};
+
+interface IGetPrompt {
+  objective: Pick<
+    Objective,
+    "coach" | "duration" | "description" | "motivation"
+  > & { success: Success[] };
+  name: string;
+}
+
+const getPrompt = ({ objective, name }: IGetPrompt): string => {
+  const successCount = objective.success.length;
+
+  return `
+  Imagine ${objective.coach} is encouraging ${name} 
+  to pursue his goal of ${objective.description} for ${objective.duration} days 
+  in order to afford ${objective.motivation}.
+  It has lasted ${successCount} days already.
+  The style of ${objective.coach} must be recognizable and it must be funny.
+  `;
+};
+
+export const getEncouragement = async ({ objective, name }: IGetPrompt) => {
+  const prompt = getPrompt({ objective, name });
+  const completion = await getTextCompletion(prompt);
+  return completion;
 };

@@ -9,7 +9,7 @@ import { Editable } from "./editable";
 import { Section } from "./section";
 import { RefreshEncouragementContext, useEditObjective } from "~/routes";
 import { useGetCurrentUser } from "~/routes/layout";
-import { getTextCompletion } from "~/utilities/encouragement";
+import { getEncouragement } from "~/utilities/encouragement";
 import type { Objective, Success } from "~/server/db/schema";
 
 export const getPrompt = ({
@@ -47,9 +47,10 @@ export const ObjectiveSection = component$(
       track(() => refresh.value);
       try {
         if (user) {
-          const prompt = getPrompt({ objective, name: user.name || "User" });
-
-          return await getTextCompletion(prompt);
+          return await getEncouragement({
+            objective,
+            name: user?.name || "user",
+          });
         }
         return "User undefined";
       } catch (error) {
