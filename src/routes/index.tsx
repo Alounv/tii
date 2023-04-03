@@ -11,7 +11,7 @@ import { routeAction$ } from "@builder.io/qwik-city";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { DangerSection } from "~/components/danger";
 import { Login } from "~/components/login";
-import { ObjectiveSection } from "~/components/objective";
+import { ObjectiveComponent } from "~/components/objective";
 import { ProgressSection } from "~/components/progress";
 import { RewardSection } from "~/components/reward";
 import { Welcome } from "~/components/welcome";
@@ -24,6 +24,8 @@ import {
 import { setSuccess } from "~/data/success";
 import { getUserFromCookie } from "~/data/user";
 import { useGetCurrentUser } from "./layout";
+import { Section } from "~/components/section";
+import { Encouragement } from "~/components/encouragement";
 
 export default component$(() => {
   const { value: user } = useGetCurrentUser();
@@ -41,7 +43,10 @@ export default component$(() => {
 
   return (
     <div class="text-gray-600">
-      <ObjectiveSection objective={objective} />
+      <Section title="Objective">
+        <ObjectiveComponent objective={objective} />
+        <Encouragement objective={objective} />
+      </Section>
       <RewardSection objective={objective} />
       <ProgressSection objective={objective} />
       <DangerSection objectiveId={objective.id} />
