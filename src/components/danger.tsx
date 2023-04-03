@@ -15,14 +15,14 @@ export const DangerSection = component$(({ objectiveId }: IDangerSection) => {
         <summary class="text-sm text-gray-400 cursor-pointer">open</summary>
         <Form
           action={deleteAction}
-          class="flex mb-4 items-center justify-center gap-4"
+          class="flex flex-col sm:flex-row mb-4 items-center justify-center gap-4"
         >
           <input type="hidden" name="objectiveId" value={objectiveId} />
 
-          <button class="rounded-lg text-sm font-semibold py-2.5 px-4 bg-red-600 text-white hover:bg-red-700">
+          <button class="mt-2 rounded-lg text-sm font-semibold py-2.5 px-4 bg-red-600 text-white hover:bg-red-700">
             Delete objective
           </button>
-          <div class="text-sm text-red-400">⚠️ cannot not be reversed</div>
+          <div class="text-sm text-red-400">⚠️ cannot be reversed</div>
         </Form>
       </details>
     </Section>

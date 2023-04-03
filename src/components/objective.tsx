@@ -73,7 +73,7 @@ export const ObjectiveSection = component$(
 
           <div class="mt-12">
             <div class="flex gap-2 items-center">
-              Coached by:{" "}
+              <div class="flex-shrink-0">Coached by: </div>
               <Editable
                 classes="font-medium text-gray-800 w-80 flex-shrink-0"
                 name="coach"
@@ -89,7 +89,7 @@ export const ObjectiveSection = component$(
                 new encouragement
               </button>
             </div>
-            <div class="rounded-xl p-8 bg-gray-50 border italic mt-2 text-lg text-gray-900 text-center">
+            <div class="rounded-xl p-2 sm:p-8 bg-gray-50 border italic mt-2 text-lg text-gray-900 text-center">
               <Resource
                 value={encouragementResource}
                 onPending={() => <div class="text-gray-300">Loading...</div>}
