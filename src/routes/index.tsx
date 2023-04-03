@@ -79,6 +79,7 @@ export const useCreateObjective = routeAction$(async (_, { cookie, fail }) => {
     const objective = await createObjective({ userId: user.id });
     return { success: true, objective };
   } catch (e: any) {
+    console.error(e);
     return fail(500, e.message);
   }
 });
@@ -89,6 +90,7 @@ export const useDeleteObjective = routeAction$(
       await deleteObjective(objectiveId);
       return { success: true };
     } catch (e: any) {
+      console.error(e);
       return fail(500, e.message);
     }
   },
@@ -107,19 +109,24 @@ const objectiveEditSchema = z.object({
   motivation_url: z.string().optional(),
 });
 
-export const useEditObjective = routeAction$(async (input) => {
+export const useEditObjective = routeAction$(async (input, { fail }) => {
   try {
     const { duration: stringDuration, daily_saving, ...rest } = input;
-
     const duration = stringDuration ? parseInt(stringDuration) : undefined;
-    const cost = daily_saving
-      ? parseInt(daily_saving) * (duration || 0)
-      : undefined;
 
-    await updateObjective({ duration, cost, ...rest });
+    const partialObjective = {
+      ...(duration ? { duration } : {}),
+      ...(daily_saving
+        ? { cost: parseInt(daily_saving) * (duration || 0) }
+        : {}),
+      ...rest,
+    };
+
+    await updateObjective(partialObjective);
     return { success: true };
   } catch (e: any) {
-    return { success: false, error: e.message };
+    console.error(e);
+    fail(500, e.message);
   }
 }, zod$(objectiveEditSchema));
 
@@ -135,6 +142,7 @@ export const useToggleTodaySuccess = routeAction$(
       await setSuccess({ objectiveId, isDone, date: new Date(date) });
       return { success: true };
     } catch (e: any) {
+      console.error(e);
       return fail(500, e.message);
     }
   },
