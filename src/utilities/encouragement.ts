@@ -1,5 +1,5 @@
 import { Configuration, OpenAIApi } from "openai";
-import type { Objective, Success } from "~/server/db/schema";
+import type { Objective } from "~/server/db/schema";
 
 const OPTIONS = {
   max_tokens: 2048,
@@ -17,30 +17,50 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
-const getTextCompletion = async (prompt: string): Promise<string> => {
-  try {
-    const completion = await openai.createCompletion(
-      { ...OPTIONS, prompt },
-      { timeout: 60_000 },
-    );
-    return completion.data.choices[0].text || "";
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+const getTextCompletion = async (
+  prompt: string,
+  onData: (data: string) => void,
+): Promise<void> => {
+  const response = await openai.createCompletion(
+    { ...OPTIONS, prompt, stream: true },
+    { timeout: 60_000, responseType: "stream" },
+  );
+
+  // @ts-ignore
+  response.data.on("data", (data) => {
+    const lines = data
+      .toString()
+      .split("\n")
+      .filter((line: string) => line.trim() !== "");
+
+    for (const l of lines) {
+      const message = l.replace(/^data: /, "");
+      if (message === "[DONE]") {
+        onData("[DONE]");
+        return;
+      }
+
+      try {
+        const parsedData = JSON.parse(message);
+        const content = parsedData?.choices?.[0]?.text;
+        if (content) onData(content);
+      } catch (e: any) {
+        console.error(`Could not parse data string |${message}|`, e.message);
+      }
+    }
+  });
 };
 
 interface IGetPrompt {
   objective: Pick<
     Objective,
     "coach" | "duration" | "description" | "motivation"
-  > & { success: Success[] };
+  >;
+  successCount: number;
   name: string;
 }
 
-const getPrompt = ({ objective, name }: IGetPrompt): string => {
-  const successCount = objective.success.length;
-
+const getPrompt = ({ objective, successCount, name }: IGetPrompt): string => {
   return `
   Imagine ${objective.coach} is encouraging ${name} 
   to pursue his goal of ${objective.description} for ${objective.duration} days 
@@ -50,8 +70,12 @@ const getPrompt = ({ objective, name }: IGetPrompt): string => {
   `;
 };
 
-export const getEncouragement = async ({ objective, name }: IGetPrompt) => {
-  const prompt = getPrompt({ objective, name });
-  const completion = await getTextCompletion(prompt);
-  return completion;
+export const getEncouragement = async ({
+  objective,
+  successCount,
+  name,
+  onData,
+}: IGetPrompt & { onData: (data: string) => void }) => {
+  const prompt = getPrompt({ objective, name, successCount });
+  getTextCompletion(prompt, onData);
 };
