@@ -4,6 +4,8 @@ import { SuccessCheckbox } from "./success";
 import { getIsTheSameDay, getIsToday, getIsYesterday } from "~/utilities/date";
 import type { Objective, Success } from "~/server/db/schema";
 
+const PAST_DAYS_COUNT = 30;
+
 const getNumberOfBoxes = ({
   duration,
   success,
@@ -25,7 +27,7 @@ const getNumberOfBoxes = ({
     (now.getTime() - firstDate.getTime()) / 86400000,
   );
   const pastDays = arePastModificationsAllowed
-    ? Math.max(15, realPastDays)
+    ? Math.max(PAST_DAYS_COUNT, realPastDays)
     : realPastDays;
   const remainingDays = duration - success.length;
   const count = pastDays + remainingDays + (isTodayPassed ? 1 : 0);
