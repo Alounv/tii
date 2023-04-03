@@ -12,27 +12,6 @@ import { useGetCurrentUser } from "~/routes/layout";
 import { getEncouragement } from "~/utilities/encouragement";
 import type { Objective, Success } from "~/server/db/schema";
 
-export const getPrompt = ({
-  objective,
-  name,
-}: {
-  objective: Pick<
-    Objective,
-    "coach" | "duration" | "description" | "motivation"
-  > & { success: Success[] };
-  name: string;
-}): string => {
-  const successCount = objective.success.length;
-
-  return `
-  Imagine ${objective.coach} is encouraging ${name} 
-  to pursue his goal of ${objective.description} for ${objective.duration} days 
-  in order to afford ${objective.motivation}.
-  It has lasted ${successCount} days already.
-  The style of ${objective.coach} must be recognizable and it must be funny.
-  `;
-};
-
 interface IObjectiveSection {
   objective: Objective & { success: Success[] };
 }
