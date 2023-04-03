@@ -72,7 +72,7 @@ export const ObjectiveSection = component$(
           </div>
 
           <div class="mt-12">
-            <div class="flex gap-2 items-center">
+            <div class="flex flex-wrap gap-2 items-center">
               <div class="flex-shrink-0">Coached by: </div>
               <Editable
                 classes="font-medium text-gray-800 w-80 flex-shrink-0"

@@ -1,21 +1,19 @@
 import { component$, useContext } from "@builder.io/qwik";
 import { useToggleTodaySuccess } from "~/routes";
 import { RefreshEncouragementContext } from "~/routes";
-import { getIsToday, getIsYesterday } from "~/utilities/date";
 
 interface ISuccess {
   isPassed: boolean;
   isFailed: boolean;
+  isEditable: boolean;
   date: Date;
   objectiveId: string;
 }
 
 export const SuccessCheckbox = component$(
-  ({ isPassed, isFailed, date, objectiveId }: ISuccess) => {
+  ({ isPassed, isFailed, date, objectiveId, isEditable }: ISuccess) => {
     const successAction = useToggleTodaySuccess();
-    const isToday = getIsToday(date);
-    const isYesterday = getIsYesterday(date);
-    const action = isToday || isYesterday ? successAction : undefined;
+    const action = isEditable ? successAction : undefined;
 
     const day = date.getDate();
     const month = date.getMonth() + 1;
