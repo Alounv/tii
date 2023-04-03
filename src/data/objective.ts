@@ -1,5 +1,7 @@
+import { Pool } from "@neondatabase/serverless";
 import { eq } from "drizzle-orm/expressions";
-import { db } from "~/server/db/client";
+import { drizzle } from "drizzle-orm/neon-serverless";
+import { dbConfig } from "~/server/db/client";
 import type { NewObjective, Objective } from "~/server/db/schema";
 import { successTable } from "~/server/db/schema";
 import { objectivesTable } from "~/server/db/schema";
@@ -17,28 +19,41 @@ const defaultObjective: Omit<Objective, "userId" | "id"> = {
 export const createObjective = async ({
   userId,
 }: Pick<Objective, "userId">) => {
+  const pool = new Pool(dbConfig);
+  const db = drizzle(pool);
+
   const newObjective: NewObjective = { ...defaultObjective, userId };
   const inserted = await db
     .insert(objectivesTable)
     .values(newObjective)
     .returning();
+
+  await pool.end();
   return inserted[0];
 };
 
 export const updateObjective = async (
   partialObjective: Partial<Objective> & { id: string },
 ) => {
+  const pool = new Pool(dbConfig);
+  const db = drizzle(pool);
+
   const updated = await db
     .update(objectivesTable)
     .set(partialObjective)
     .where(eq(objectivesTable.id, partialObjective.id))
     .returning();
+
+  await pool.end();
   return updated[0];
 };
 
 export const getObjectiveWithSuccessFromUser = async ({
   userId,
 }: Pick<Objective, "userId">) => {
+  const pool = new Pool(dbConfig);
+  const db = drizzle(pool);
+
   const objectives = await db
     .select()
     .from(objectivesTable)
@@ -52,9 +67,18 @@ export const getObjectiveWithSuccessFromUser = async ({
     .from(successTable)
     .where(eq(successTable.objectiveId, objective.id));
 
+  await pool.end();
   return { ...objective, success };
 };
 
 export const deleteObjective = async (id: string) => {
-  return db.delete(objectivesTable).where(eq(objectivesTable.id, id));
+  const pool = new Pool(dbConfig);
+  const db = drizzle(pool);
+
+  const deleted = await db
+    .delete(objectivesTable)
+    .where(eq(objectivesTable.id, id));
+
+  await pool.end();
+  return deleted;
 };

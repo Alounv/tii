@@ -70,7 +70,7 @@ export const useGetUserObjective = routeLoader$(async ({ cookie }) => {
   }
 });
 
-export const useCreateObjective = routeAction$(async (_, { cookie }) => {
+export const useCreateObjective = routeAction$(async (_, { cookie, fail }) => {
   try {
     const user = await getUserFromCookie(cookie);
     if (!user) {
@@ -79,17 +79,17 @@ export const useCreateObjective = routeAction$(async (_, { cookie }) => {
     const objective = await createObjective({ userId: user.id });
     return { success: true, objective };
   } catch (e: any) {
-    return { success: false, error: e.message };
+    return fail(500, e.message);
   }
 });
 
 export const useDeleteObjective = routeAction$(
-  async ({ objectiveId }) => {
+  async ({ objectiveId }, { fail }) => {
     try {
       await deleteObjective(objectiveId);
       return { success: true };
     } catch (e: any) {
-      return { success: false, error: e.message };
+      return fail(500, e.message);
     }
   },
   zod$({
@@ -106,8 +106,6 @@ const objectiveEditSchema = z.object({
   motivation: z.string().optional(),
   motivation_url: z.string().optional(),
 });
-
-export type ObjectiveEditSchema = z.infer<typeof objectiveEditSchema>;
 
 export const useEditObjective = routeAction$(async (input) => {
   try {
@@ -132,12 +130,12 @@ const setSuccessSchema = z.object({
 });
 
 export const useToggleTodaySuccess = routeAction$(
-  async ({ objectiveId, isDone, date }) => {
+  async ({ objectiveId, isDone, date }, { fail }) => {
     try {
       await setSuccess({ objectiveId, isDone, date: new Date(date) });
       return { success: true };
     } catch (e: any) {
-      return { success: false, error: e.message };
+      return fail(500, e.message);
     }
   },
   zod$(setSuccessSchema),
