@@ -21,7 +21,7 @@ export const Encouragement = component$(({ objective }: IEncouragement) => {
   const refresh = useContext(RefreshEncouragementContext);
   const ref = useSignal<HTMLElement>();
 
-  useVisibleTask$(async ({ track }) => {
+  useVisibleTask$(async ({ track, cleanup }) => {
     track(refresh);
 
     if (!user) return;
@@ -29,8 +29,11 @@ export const Encouragement = component$(({ objective }: IEncouragement) => {
       objective || {};
 
     ref.value!.textContent = "";
+    const controller = new AbortController();
+    cleanup(() => controller.abort());
 
     getEncouragement({
+      controller,
       objective: { coach, description, duration, motivation },
       successCount: success.length,
       name: user.name || "user",

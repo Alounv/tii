@@ -20,8 +20,10 @@ const decoder = new TextDecoder("utf-8");
 const getTextCompletion = async (
   prompt: string,
   onData: (data: string) => void,
+  controller: AbortController,
 ): Promise<void> => {
   const response = await fetch("https://api.openai.com/v1/completions", {
+    signal: controller?.signal,
     method: "POST",
     headers,
     body: JSON.stringify({ ...OPTIONS, prompt, stream: true }),
@@ -74,11 +76,15 @@ const getPrompt = ({ objective, successCount, name }: IGetPrompt): string => {
 };
 
 export const getEncouragement = async ({
+  controller,
   objective,
   successCount,
   name,
   onData,
-}: IGetPrompt & { onData: (data: string) => void }) => {
+}: IGetPrompt & {
+  onData: (data: string) => void;
+  controller: AbortController;
+}) => {
   const prompt = getPrompt({ objective, name, successCount });
-  getTextCompletion(prompt, onData);
+  getTextCompletion(prompt, onData, controller);
 };
