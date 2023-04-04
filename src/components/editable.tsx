@@ -18,13 +18,12 @@ export const Editable = component$(
 
     useTask$(({ track }) => {
       track(() => useIsEdited.value);
+      if (!useIsEdited.value) return;
+
       setTimeout(() => {
         const input = inputRef.value;
         input?.focus?.();
       }, 50);
-      if (useIsEdited.value === false) {
-        submitRef.value?.click();
-      }
     });
 
     const inputCls =
@@ -49,6 +48,7 @@ export const Editable = component$(
           rows={rows}
           onBlur$={() => {
             useIsEdited.value = false;
+            submitRef.value?.click();
           }}
         />
         <span
@@ -57,10 +57,10 @@ export const Editable = component$(
             useIsEdited.value = true;
           }}
         >
-          {label || value}
+          {label || value || "Click to edit"}
         </span>
         <button type="submit" class="hidden" ref={submitRef} />
       </>
     );
-  }
+  },
 );
